@@ -127,6 +127,33 @@ export const tasks = pgTable("tasks", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ---------- Vault (ciphertext only — server never sees plaintext) ----------
+
+export const vaultMeta = pgTable("vault_meta", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  // base64 PBKDF2 salt
+  salt: text("salt").notNull(),
+  // AES-GCM({iv, ct}) of a known constant, proves a candidate key is correct
+  keyCheck: text("key_check").notNull(),
+  iterations: integer("iterations").notNull().default(600000),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const vaultItems = pgTable("vault_items", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  // item kind is plaintext (low sensitivity) so the UI can tab-filter
+  type: text("type", { enum: ["login", "apikey", "note", "pem"] }).notNull(),
+  // JSON {iv, ct} — AES-256-GCM encrypted item payload
+  data: text("data").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // ---------- Habits ----------
 
 export const habits = pgTable("habits", {

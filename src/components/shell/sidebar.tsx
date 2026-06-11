@@ -14,6 +14,7 @@ import {
   Flame,
   Inbox,
   LayoutDashboard,
+  ShieldCheck,
   Target,
   Plus,
   Settings2,
@@ -83,6 +84,7 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
         {navLink("/events", "Events", undefined, PartyPopper)}
         {navLink("/habits", "Habits", undefined, Flame)}
         {navLink("/goals", "Goals", undefined, Target)}
+        {navLink("/vault", "Vault", undefined, ShieldCheck)}
       </div>
 
       <div>
