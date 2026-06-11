@@ -380,6 +380,20 @@ export const events = pgTable("events", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+// ---------- Spreadsheets ----------
+
+export const sheets = pgTable("sheets", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull().default("Untitled sheet"),
+  // Univer IWorkbookData snapshot JSON
+  data: text("data").notNull().default(""),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
 // ---------- Notes ----------
 
 export const notes = pgTable("notes", {
