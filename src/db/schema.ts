@@ -127,6 +127,36 @@ export const tasks = pgTable("tasks", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ---------- Notes ----------
+
+export const notes = pgTable("notes", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  parentId: text("parent_id"),
+  title: text("title").notNull().default("Untitled"),
+  icon: text("icon").notNull().default("📄"),
+  // BlockNote document JSON
+  content: text("content").notNull().default("[]"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const noteTaskLinks = pgTable(
+  "note_task_links",
+  {
+    noteId: text("note_id")
+      .notNull()
+      .references(() => notes.id, { onDelete: "cascade" }),
+    taskId: text("task_id")
+      .notNull()
+      .references(() => tasks.id, { onDelete: "cascade" }),
+  },
+  (t) => [primaryKey({ columns: [t.noteId, t.taskId] })]
+);
+
 // ---------- Worklog (ported from worklog-daily) ----------
 
 export const worklogSettings = pgTable("worklog_settings", {

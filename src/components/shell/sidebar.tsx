@@ -8,6 +8,7 @@ import {
   CheckCircle2,
   ChevronDown,
   FileClock,
+  FileText,
   Inbox,
   Plus,
   Settings2,
@@ -68,6 +69,10 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
     <nav className="flex h-full flex-col gap-4 overflow-y-auto p-3">
       <div className="space-y-0.5">
         {smartLists.map((l) => navLink(l.href, l.label, undefined, l.icon))}
+      </div>
+
+      <div className="space-y-0.5">
+        {navLink("/notes", "Notes", undefined, FileText)}
       </div>
 
       <div>
