@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Inbox, LayoutDashboard, Menu, Sun } from "lucide-react";
+import { Inbox, LayoutDashboard, LayoutGrid, Menu, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
+  { href: "/apps", label: "Apps", icon: LayoutGrid },
   { href: "/", label: "Home", icon: LayoutDashboard },
   { href: "/today", label: "Today", icon: Sun },
-  { href: "/upcoming", label: "Upcoming", icon: CalendarDays },
   { href: "/inbox", label: "Inbox", icon: Inbox },
 ];
 

@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Moon, PanelLeft, Settings, Sun, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { LayoutGrid, Moon, PanelLeft, Settings, Sun, X } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Sidebar } from "./sidebar";
 import { MobileBottomNav } from "./mobile-nav";
@@ -33,6 +34,9 @@ function ThemeToggle() {
 export function AppShell({ areas, projects, tags, userName, children }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+  // wide canvases need the full viewport
+  const fullWidth = pathname.startsWith("/sheets/") || pathname.startsWith("/apps");
 
   return (
     <div className="flex min-h-dvh">
@@ -108,6 +112,13 @@ export function AppShell({ areas, projects, tags, userName, children }: AppShell
           >
             <PanelLeft className="h-4 w-4" />
           </button>
+          <Link
+            href="/apps"
+            className="hidden rounded-md p-1.5 text-muted-foreground hover:bg-accent md:block"
+            aria-label="All apps"
+          >
+            <LayoutGrid className="h-4 w-4" />
+          </Link>
           <span className="text-sm font-semibold md:hidden">Life OS</span>
           <div className="ml-auto flex items-center gap-1 md:hidden">
             <ThemeToggle />
@@ -117,7 +128,9 @@ export function AppShell({ areas, projects, tags, userName, children }: AppShell
           </span>
         </header>
         <main className="flex-1 px-3 pb-24 pt-4 md:px-8 md:pb-8">
-          <div className="mx-auto w-full max-w-3xl">{children}</div>
+          <div className={cn("mx-auto w-full", fullWidth ? "max-w-none" : "max-w-3xl")}>
+            {children}
+          </div>
         </main>
       </div>
 
