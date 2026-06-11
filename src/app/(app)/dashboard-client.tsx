@@ -4,12 +4,23 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import {
-  ArrowDown,
-  ArrowUp,
-  Check,
-  Pencil,
-  X,
-} from "lucide-react";
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  rectSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { Check, GripVertical, Pencil } from "lucide-react";
+import { WeatherChip } from "@/components/dashboard/weather-chip";
+import { NewsWidget } from "@/components/dashboard/news-widget";
 import { toggleTaskDone } from "@/actions/tasks";
 import { toggleHabitCheck } from "@/actions/habits";
 import { saveDashboardPrefs } from "@/actions/dashboard";
@@ -29,6 +40,7 @@ export const DEFAULT_WIDGETS: WidgetPrefRow[] = [
   { key: "upcoming", enabled: true },
   { key: "goals", enabled: true },
   { key: "notes", enabled: true },
+  { key: "news", enabled: true },
 ];
 
 const WIDGET_LABELS: Record<string, string> = {
@@ -38,6 +50,7 @@ const WIDGET_LABELS: Record<string, string> = {
   upcoming: "Upcoming",
   goals: "Goals",
   notes: "Recent notes",
+  news: "AI & tech news",
 };
 
 export interface WidgetData {
@@ -90,12 +103,20 @@ export function Dashboard({
   const [editing, setEditing] = useState(false);
   const [, startTransition] = useTransition();
 
-  function move(idx: number, dir: -1 | 1) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 8 },
+    })
+  );
+
+  function onDragEnd(e: DragEndEvent) {
+    const { active, over } = e;
+    if (!over || active.id === over.id) return;
     setPrefs((p) => {
-      const next = [...p];
-      const j = idx + dir;
-      if (j < 0 || j >= next.length) return p;
-      [next[idx], next[j]] = [next[j], next[idx]];
+      const keys = p.map((x) => x.key);
+      const next = arrayMove(p, keys.indexOf(String(active.id)), keys.indexOf(String(over.id)));
+      startTransition(() => saveDashboardPrefs(next));
       return next;
     });
   }
@@ -107,13 +128,16 @@ export function Dashboard({
   return (
     <div className="space-y-6">
       <header className="flex items-start justify-between">
-        <div>
+        <div className="space-y-1.5">
           <h1 className="text-xl font-semibold tracking-tight">
             {greeting}, {userName.split(" ")[0]}
           </h1>
-          <p className="text-sm text-muted-foreground">
-            {format(new Date(), "EEEE, d MMMM yyyy")}
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-sm text-muted-foreground">
+              {format(new Date(), "EEEE, d MMMM yyyy")}
+            </p>
+            <WeatherChip />
+          </div>
         </div>
         <button
           onClick={() => {
@@ -142,11 +166,12 @@ export function Dashboard({
       {editing && (
         <div className="space-y-1 rounded-lg border border-border bg-card p-3">
           <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Arrange widgets
+            Show / hide — drag the cards below to rearrange
           </p>
-          {prefs.map((p, i) => (
-            <div key={p.key} className="flex items-center gap-2 text-sm">
+          <div className="flex flex-wrap gap-2">
+            {prefs.map((p) => (
               <button
+                key={p.key}
                 onClick={() =>
                   setPrefs((ps) =>
                     ps.map((x) =>
@@ -155,34 +180,78 @@ export function Dashboard({
                   )
                 }
                 className={cn(
-                  "flex h-4 w-4 items-center justify-center rounded border",
+                  "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs",
                   p.enabled
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-muted-foreground/40"
+                    ? "border-primary bg-primary/10 font-medium"
+                    : "border-border text-muted-foreground"
                 )}
-                aria-label="Toggle widget"
               >
                 {p.enabled && <Check className="h-3 w-3" strokeWidth={3} />}
+                {WIDGET_LABELS[p.key] ?? p.key}
               </button>
-              <span className="flex-1">{WIDGET_LABELS[p.key] ?? p.key}</span>
-              <button onClick={() => move(i, -1)} className="p-1 text-muted-foreground hover:text-foreground" aria-label="Move up">
-                <ArrowUp className="h-3.5 w-3.5" />
-              </button>
-              <button onClick={() => move(i, 1)} className="p-1 text-muted-foreground hover:text-foreground" aria-label="Move down">
-                <ArrowDown className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        {prefs
-          .filter((p) => p.enabled)
-          .map((p) => (
-            <Widget key={p.key} type={p.key} data={data} />
-          ))}
-      </div>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={onDragEnd}
+      >
+        <SortableContext
+          items={prefs.filter((p) => p.enabled).map((p) => p.key)}
+          strategy={rectSortingStrategy}
+        >
+          <div className="grid gap-4 lg:grid-cols-2">
+            {prefs
+              .filter((p) => p.enabled)
+              .map((p) => (
+                <SortableWidget key={p.key} id={p.key} editing={editing}>
+                  <Widget type={p.key} data={data} />
+                </SortableWidget>
+              ))}
+          </div>
+        </SortableContext>
+      </DndContext>
+    </div>
+  );
+}
+
+function SortableWidget({
+  id,
+  editing,
+  children,
+}: {
+  id: string;
+  editing: boolean;
+  children: React.ReactNode;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id, disabled: !editing });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: transform
+          ? `translate(${transform.x}px, ${transform.y}px)`
+          : undefined,
+        transition,
+      }}
+      className={cn("relative", isDragging && "z-10 opacity-70")}
+    >
+      {editing && (
+        <button
+          {...attributes}
+          {...listeners}
+          className="absolute -left-1.5 top-3 z-10 cursor-grab rounded bg-card p-1 text-muted-foreground shadow active:cursor-grabbing"
+          aria-label="Drag widget"
+        >
+          <GripVertical className="h-4 w-4" />
+        </button>
+      )}
+      {children}
     </div>
   );
 }
@@ -382,6 +451,12 @@ function Widget({ type, data }: { type: string; data: WidgetData }) {
           ) : (
             <p className="text-sm text-muted-foreground">No notes yet.</p>
           )}
+        </Card>
+      );
+    case "news":
+      return (
+        <Card title="AI & tech news" href="https://news.ycombinator.com">
+          <NewsWidget />
         </Card>
       );
     default:
