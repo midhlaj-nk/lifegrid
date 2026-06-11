@@ -496,6 +496,7 @@ function ItemCard({
   onDelete: () => void;
 }) {
   const [revealed, setRevealed] = useState<Record<string, boolean>>({});
+  const [now] = useState(() => Date.now());
   const f = item.fields;
 
   const secretKeys = TYPE_FIELDS[item.type]
@@ -506,7 +507,7 @@ function ItemCard({
 
   const expiringSoon =
     item.type === "apikey" && f.expiresAt
-      ? (new Date(f.expiresAt).getTime() - Date.now()) / 86400000
+      ? (new Date(f.expiresAt).getTime() - now) / 86400000
       : null;
 
   return (

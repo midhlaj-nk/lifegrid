@@ -1,5 +1,5 @@
 import { and, asc, desc, eq, gte, lte } from "drizzle-orm";
-import { format, subMonths } from "date-fns";
+import { endOfMonth, format, parseISO, subMonths } from "date-fns";
 import { db } from "@/db";
 import {
   finAccounts,
@@ -54,6 +54,7 @@ export async function getCategories(userId: string) {
 }
 
 export async function getMonthTransactions(userId: string, month: string) {
+  const monthEnd = format(endOfMonth(parseISO(`${month}-01`)), "yyyy-MM-dd");
   return db
     .select()
     .from(finTransactions)
@@ -61,7 +62,7 @@ export async function getMonthTransactions(userId: string, month: string) {
       and(
         eq(finTransactions.userId, userId),
         gte(finTransactions.date, `${month}-01`),
-        lte(finTransactions.date, `${month}-31`)
+        lte(finTransactions.date, monthEnd)
       )
     )
     .orderBy(desc(finTransactions.date), desc(finTransactions.createdAt));

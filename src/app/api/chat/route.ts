@@ -6,7 +6,7 @@ import {
   type UIMessage,
 } from "ai";
 import { z } from "zod";
-import { format } from "date-fns";
+import { endOfMonth, format } from "date-fns";
 import { and, asc, desc, eq, gte, ilike, lte, ne } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { db } from "@/db";
@@ -117,7 +117,10 @@ function buildTools(userId: string) {
             and(
               eq(finTransactions.userId, userId),
               gte(finTransactions.date, `${month}-01`),
-              lte(finTransactions.date, `${month}-31`)
+              lte(
+                finTransactions.date,
+                format(endOfMonth(new Date(`${month}-01T00:00:00`)), "yyyy-MM-dd")
+              )
             )
           );
         const cats = await db
