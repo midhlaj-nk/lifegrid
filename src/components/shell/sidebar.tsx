@@ -3,11 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Briefcase,
   CalendarDays,
   CheckCircle2,
   ChevronDown,
+  FileClock,
   Inbox,
   Plus,
+  Settings2,
   Sun,
   Tag as TagIcon,
 } from "lucide-react";
@@ -65,6 +68,20 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
     <nav className="flex h-full flex-col gap-4 overflow-y-auto p-3">
       <div className="space-y-0.5">
         {smartLists.map((l) => navLink(l.href, l.label, undefined, l.icon))}
+      </div>
+
+      <div>
+        <div className="mb-1 px-2.5">
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Worklog
+          </span>
+        </div>
+        <div className="space-y-0.5">
+          {navLink("/worklog", "Daily report", undefined, Briefcase)}
+          {navLink("/worklog/weekly", "Weekly report", undefined, CalendarDays)}
+          {navLink("/worklog/history", "History", undefined, FileClock)}
+          {navLink("/worklog/settings", "Worklog settings", undefined, Settings2)}
+        </div>
       </div>
 
       <div>
