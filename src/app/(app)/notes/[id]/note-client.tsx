@@ -1,9 +1,79 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Link2, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { FolderInput, Link2, X } from "lucide-react";
 import { updateNote, linkNoteToTask, unlinkNoteFromTask } from "@/actions/notes";
+import { AppModal } from "@/components/ui/app-dialog";
 import { cn } from "@/lib/utils";
+
+export function MoveNoteButton({
+  noteId,
+  allNotes,
+}: {
+  noteId: string;
+  allNotes: { id: string; title: string; icon: string; parentId: string | null }[];
+}) {
+  const [open, setOpen] = useState(false);
+  const [pending, startTransition] = useTransition();
+  const router = useRouter();
+
+  // exclude self and its descendants as move targets
+  const blocked = new Set([noteId]);
+  let grew = true;
+  while (grew) {
+    grew = false;
+    for (const n of allNotes) {
+      if (n.parentId && blocked.has(n.parentId) && !blocked.has(n.id)) {
+        blocked.add(n.id);
+        grew = true;
+      }
+    }
+  }
+  const targets = allNotes.filter((n) => !blocked.has(n.id));
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+      >
+        <FolderInput className="h-3 w-3" /> Move
+      </button>
+      <AppModal open={open} onClose={() => setOpen(false)} title="Move page to…">
+        <div className={cn("max-h-72 space-y-0.5 overflow-y-auto", pending && "opacity-50")}>
+          <button
+            onClick={() =>
+              startTransition(async () => {
+                await updateNote(noteId, { parentId: null });
+                setOpen(false);
+                router.refresh();
+              })
+            }
+            className="block w-full rounded px-2 py-1.5 text-left text-sm hover:bg-accent"
+          >
+            ⬆️ Top level
+          </button>
+          {targets.map((n) => (
+            <button
+              key={n.id}
+              onClick={() =>
+                startTransition(async () => {
+                  await updateNote(noteId, { parentId: n.id });
+                  setOpen(false);
+                  router.refresh();
+                })
+              }
+              className="block w-full truncate rounded px-2 py-1.5 text-left text-sm hover:bg-accent"
+            >
+              {n.icon} {n.title}
+            </button>
+          ))}
+        </div>
+      </AppModal>
+    </>
+  );
+}
 
 export function NoteHeader({
   noteId,
@@ -16,22 +86,36 @@ export function NoteHeader({
 }) {
   const [title, setTitle] = useState(initialTitle);
   const [icon, setIcon] = useState(initialIcon);
+  const [pickingIcon, setPickingIcon] = useState(false);
 
   return (
     <div className="flex items-center gap-2">
-      <button
-        onClick={() => {
-          const next = prompt("Page emoji:", icon);
-          if (next) {
-            setIcon(next);
-            updateNote(noteId, { icon: next });
-          }
-        }}
-        className="rounded-md p-1 text-2xl hover:bg-accent"
-        aria-label="Change icon"
-      >
-        {icon}
-      </button>
+      <div className="relative">
+        <button
+          onClick={() => setPickingIcon((v) => !v)}
+          className="rounded-md p-1 text-2xl hover:bg-accent"
+          aria-label="Change icon"
+        >
+          {icon}
+        </button>
+        {pickingIcon && (
+          <div className="absolute top-11 z-10 grid w-44 grid-cols-6 gap-1 rounded-md border border-border bg-popover p-2 shadow-md">
+            {["📄","📝","💡","📌","📚","🧠","💼","🏠","💰","🛠️","🎯","🗂️","🧪","🌱","✈️","❤️","⭐","🔥"].map((e) => (
+              <button
+                key={e}
+                onClick={() => {
+                  setIcon(e);
+                  setPickingIcon(false);
+                  updateNote(noteId, { icon: e });
+                }}
+                className="rounded p-1 text-lg hover:bg-accent"
+              >
+                {e}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}

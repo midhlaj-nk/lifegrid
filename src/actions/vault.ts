@@ -61,6 +61,41 @@ export async function updateVaultItem(id: string, data: string) {
   revalidatePath("/vault");
 }
 
+/**
+ * Master-password change: client re-encrypts every item with the new key and
+ * sends all ciphertext in one shot. Still ciphertext-only on the wire.
+ */
+export async function replaceVaultKey(
+  salt: string,
+  keyCheck: string,
+  items: { id: string; data: string }[]
+) {
+  const user = await requireUser();
+  const existing = await db
+    .select({ id: vaultItems.id })
+    .from(vaultItems)
+    .where(eq(vaultItems.userId, user.id));
+  const validIds = new Set(existing.map((i) => i.id));
+  if (items.some((i) => !validIds.has(i.id)) || items.length !== validIds.size) {
+    return { error: "Item set mismatch — reload and retry" };
+  }
+
+  await db.transaction(async (tx) => {
+    await tx
+      .update(vaultMeta)
+      .set({ salt, keyCheck })
+      .where(eq(vaultMeta.userId, user.id));
+    for (const item of items) {
+      await tx
+        .update(vaultItems)
+        .set({ data: item.data, updatedAt: new Date() })
+        .where(and(eq(vaultItems.id, item.id), eq(vaultItems.userId, user.id)));
+    }
+  });
+  revalidatePath("/vault");
+  return { ok: true };
+}
+
 export async function deleteVaultItem(id: string) {
   const user = await requireUser();
   await db

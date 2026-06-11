@@ -58,7 +58,7 @@ export async function createProject(input: { name: string; areaId?: string | nul
   return id;
 }
 
-export async function updateProject(id: string, input: { name?: string; areaId?: string | null; color?: string; archived?: boolean }) {
+export async function updateProject(id: string, input: { name?: string; areaId?: string | null; color?: string; archived?: boolean; kanbanColumns?: string }) {
   const user = await requireUser();
   await db
     .update(projects)
@@ -67,6 +67,7 @@ export async function updateProject(id: string, input: { name?: string; areaId?:
       ...(input.color ? { color: color.parse(input.color) } : {}),
       ...(input.areaId !== undefined ? { areaId: input.areaId } : {}),
       ...(input.archived !== undefined ? { archived: input.archived } : {}),
+      ...(input.kanbanColumns !== undefined ? { kanbanColumns: input.kanbanColumns } : {}),
     })
     .where(and(eq(projects.id, id), eq(projects.userId, user.id)));
   revalidatePath("/", "layout");
@@ -89,6 +90,18 @@ export async function createTag(input: { name: string; color?: string }) {
   });
   revalidatePath("/", "layout");
   return id;
+}
+
+export async function updateTag(id: string, input: { name?: string; color?: string }) {
+  const user = await requireUser();
+  await db
+    .update(tags)
+    .set({
+      ...(input.name ? { name: name.parse(input.name) } : {}),
+      ...(input.color ? { color: color.parse(input.color) } : {}),
+    })
+    .where(and(eq(tags.id, id), eq(tags.userId, user.id)));
+  revalidatePath("/", "layout");
 }
 
 export async function deleteTag(id: string) {

@@ -1,8 +1,75 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient, signOut } from "@/lib/auth-client";
+
+interface SessionRow {
+  id: string;
+  token: string;
+  createdAt: Date | string;
+  userAgent?: string | null;
+  ipAddress?: string | null;
+}
+
+export function SessionsManager() {
+  const [sessions, setSessions] = useState<SessionRow[]>([]);
+  const [busy, setBusy] = useState(false);
+
+  async function load() {
+    const { data } = await authClient.listSessions();
+    setSessions((data as SessionRow[]) ?? []);
+  }
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  return (
+    <div className="space-y-2">
+      {sessions.map((s) => (
+        <div
+          key={s.id}
+          className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-xs"
+        >
+          <div className="min-w-0 flex-1">
+            <p className="truncate">{s.userAgent || "Unknown device"}</p>
+            <p className="text-muted-foreground">
+              {s.ipAddress || "no ip"} · since{" "}
+              {new Date(s.createdAt).toLocaleString()}
+            </p>
+          </div>
+          <button
+            onClick={async () => {
+              setBusy(true);
+              await authClient.revokeSession({ token: s.token });
+              await load();
+              setBusy(false);
+            }}
+            disabled={busy}
+            className="rounded border border-border px-2 py-1 hover:bg-accent disabled:opacity-50"
+          >
+            Revoke
+          </button>
+        </div>
+      ))}
+      {sessions.length > 1 && (
+        <button
+          onClick={async () => {
+            setBusy(true);
+            await authClient.revokeOtherSessions();
+            await load();
+            setBusy(false);
+          }}
+          disabled={busy}
+          className="h-9 rounded-md border border-border px-4 text-sm hover:bg-accent disabled:opacity-50"
+        >
+          Log out everywhere else
+        </button>
+      )}
+    </div>
+  );
+}
 
 export function ProfileForm({
   initialName,

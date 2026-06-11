@@ -21,9 +21,6 @@ export default async function NotesPage() {
     <div className="space-y-6">
       <header>
         <h1 className="text-xl font-semibold tracking-tight">Notes</h1>
-        <p className="text-sm text-muted-foreground">
-          Nested pages, Notion-style
-        </p>
       </header>
       <NotesTree notes={rows} />
     </div>

@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:is(.dark *));
+/* touch devices have no hover — actions hidden behind group-hover use touch:block */
+@custom-variant touch (@media (pointer: coarse));
 
 :root {
   --background: oklch(1 0 0);

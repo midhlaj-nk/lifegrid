@@ -1,10 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, isNull } from "drizzle-orm";
 import { List } from "lucide-react";
 import { db } from "@/db";
 import { projects, tasks } from "@/db/schema";
 import { requireUser } from "@/lib/session";
+import { parseKanbanColumns } from "@/lib/kanban";
 import { KanbanBoard } from "./board-client";
 
 export default async function BoardPage({
@@ -28,9 +29,16 @@ export default async function BoardPage({
       status: tasks.status,
       priority: tasks.priority,
       dueDate: tasks.dueDate,
+      kanbanColumn: tasks.kanbanColumn,
     })
     .from(tasks)
-    .where(and(eq(tasks.userId, user.id), eq(tasks.projectId, id)))
+    .where(
+      and(
+        eq(tasks.userId, user.id),
+        eq(tasks.projectId, id),
+        isNull(tasks.parentId) // subtasks stay inside their parent card
+      )
+    )
     .orderBy(asc(tasks.sortOrder), asc(tasks.createdAt));
 
   return (
@@ -52,7 +60,11 @@ export default async function BoardPage({
           <List className="h-3.5 w-3.5" /> List view
         </Link>
       </header>
-      <KanbanBoard projectId={id} tasks={rows.filter((t) => !("parentId" in t))} />
+      <KanbanBoard
+        projectId={id}
+        columns={parseKanbanColumns(project.kanbanColumns)}
+        tasks={rows}
+      />
     </div>
   );
 }

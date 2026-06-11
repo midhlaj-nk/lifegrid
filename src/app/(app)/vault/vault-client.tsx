@@ -3,12 +3,14 @@
 import { useEffect, useMemo, useState, useTransition } from "react";
 import {
   Copy,
+  Download,
   Eye,
   EyeOff,
   KeyRound,
   Lock,
   Plus,
   RefreshCw,
+  Search,
   Server,
   ShieldCheck,
   StickyNote,
@@ -30,11 +32,13 @@ import {
   PBKDF2_ITERATIONS,
   type EncryptedBlob,
 } from "@/lib/vault-crypto";
+import { useConfirm, AppModal } from "@/components/ui/app-dialog";
 import {
   setupVault,
   createVaultItem,
   updateVaultItem,
   deleteVaultItem,
+  replaceVaultKey,
 } from "@/actions/vault";
 import { cn } from "@/lib/utils";
 
@@ -284,7 +288,10 @@ function UnlockedView({
   const [decrypted, setDecrypted] = useState<DecryptedItem[] | null>(null);
   const [tab, setTab] = useState<ItemType>("login");
   const [editing, setEditing] = useState<DecryptedItem | "new" | null>(null);
+  const [query, setQuery] = useState("");
+  const [changingPw, setChangingPw] = useState(false);
   const [pending, startTransition] = useTransition();
+  const confirmDialog = useConfirm();
 
   useEffect(() => {
     (async () => {
@@ -302,10 +309,31 @@ function UnlockedView({
     })();
   }, [items, vaultKey]);
 
-  const visible = useMemo(
-    () => (decrypted ?? []).filter((i) => i.type === tab),
-    [decrypted, tab]
-  );
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return (decrypted ?? []).filter(
+      (i) =>
+        i.type === tab &&
+        (!q ||
+          Object.values(i.fields).some((v) => v.toLowerCase().includes(q)))
+    );
+  }, [decrypted, tab, query]);
+
+  function exportBackup() {
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      note: "Life OS vault backup — ciphertext only; needs your master password to decrypt.",
+      items: items.map((i) => ({ id: i.id, type: i.type, data: i.data })),
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json",
+    });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `vault-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
 
   async function save(type: ItemType, id: string | null, fields: Record<string, string>) {
     const blob = await encrypt(vaultKey, JSON.stringify(fields));
@@ -328,13 +356,38 @@ function UnlockedView({
           <ShieldCheck className="h-5 w-5 text-emerald-500" />
           <h1 className="text-xl font-semibold tracking-tight">Vault</h1>
         </div>
-        <button
-          onClick={onLock}
-          className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent"
-        >
-          <Lock className="h-3.5 w-3.5" /> Lock now
-        </button>
+        <div className="flex gap-1.5">
+          <button
+            onClick={exportBackup}
+            title="Download encrypted backup"
+            className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent"
+          >
+            <Download className="h-3.5 w-3.5" /> Backup
+          </button>
+          <button
+            onClick={() => setChangingPw(true)}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent"
+          >
+            <KeyRound className="h-3.5 w-3.5" /> Change password
+          </button>
+          <button
+            onClick={onLock}
+            className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent"
+          >
+            <Lock className="h-3.5 w-3.5" /> Lock now
+          </button>
+        </div>
       </header>
+
+      <div className="relative">
+        <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search vault…"
+          className="h-9 w-full rounded-md border border-input bg-background pl-8 pr-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        />
+      </div>
 
       <div className="flex gap-1 overflow-x-auto">
         {(Object.keys(TYPE_META) as ItemType[]).map((t) => {
@@ -384,9 +437,14 @@ function UnlockedView({
             key={item.id}
             item={item}
             onEdit={() => setEditing(item)}
-            onDelete={() => {
-              if (confirm(`Delete "${item.fields.name || "item"}" permanently?`))
-                startTransition(() => deleteVaultItem(item.id));
+            onDelete={async () => {
+              const ok = await confirmDialog({
+                title: `Delete "${item.fields.name || "item"}" permanently?`,
+                description: "This cannot be undone.",
+                confirmLabel: "Delete",
+                danger: true,
+              });
+              if (ok) startTransition(() => deleteVaultItem(item.id));
             }}
           />
         ))}
@@ -396,7 +454,89 @@ function UnlockedView({
           </p>
         )}
       </div>
+
+      {changingPw && decrypted && (
+        <ChangePasswordDialog
+          decrypted={decrypted}
+          onClose={() => setChangingPw(false)}
+        />
+      )}
     </div>
+  );
+}
+
+function ChangePasswordDialog({
+  decrypted,
+  onClose,
+}: {
+  decrypted: DecryptedItem[];
+  onClose: () => void;
+}) {
+  const [pw, setPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function change(e: React.FormEvent) {
+    e.preventDefault();
+    if (pw.length < 10) return toast.error("Min 10 characters");
+    if (pw !== confirmPw) return toast.error("Passwords don't match");
+    setBusy(true);
+    try {
+      const salt = newSalt();
+      const key = await deriveKey(pw, salt, PBKDF2_ITERATIONS);
+      const check = await makeKeyCheck(key);
+      const items = await Promise.all(
+        decrypted.map(async (item) => ({
+          id: item.id,
+          data: JSON.stringify(await encrypt(key, JSON.stringify(item.fields))),
+        }))
+      );
+      const res = await replaceVaultKey(salt, check, items);
+      if (res.error) {
+        toast.error(res.error);
+        return;
+      }
+      await storeSessionKey(key);
+      toast.success("Master password changed — all items re-encrypted");
+      onClose();
+      location.reload();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <AppModal open onClose={onClose} title="Change master password">
+      <div className="mb-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-2.5 text-xs text-amber-700 dark:text-amber-400">
+        Every item is re-encrypted with the new password. As before: forget it
+        and the vault is unrecoverable.
+      </div>
+      <form onSubmit={change} className="space-y-3">
+        <input
+          autoFocus
+          type="password"
+          placeholder="New master password (min 10 chars)"
+          value={pw}
+          onChange={(e) => setPw(e.target.value)}
+          autoComplete="new-password"
+          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        />
+        <input
+          type="password"
+          placeholder="Confirm"
+          value={confirmPw}
+          onChange={(e) => setConfirmPw(e.target.value)}
+          autoComplete="new-password"
+          className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        />
+        <button
+          disabled={busy || pw.length < 10 || pw !== confirmPw}
+          className="h-10 w-full rounded-md bg-primary text-sm font-medium text-primary-foreground disabled:opacity-50"
+        >
+          {busy ? "Re-encrypting…" : "Change password"}
+        </button>
+      </form>
+    </AppModal>
   );
 }
 
@@ -549,7 +689,7 @@ function ItemCard({
         </button>
         <button
           onClick={onDelete}
-          className="hidden rounded p-1.5 text-muted-foreground hover:text-red-500 group-hover:block"
+          className="hidden rounded p-1.5 text-muted-foreground hover:text-red-500 group-hover:block touch:block"
           aria-label="Delete item"
         >
           <Trash2 className="h-3.5 w-3.5" />

@@ -172,6 +172,32 @@ export async function createTransactionsBulk(inputs: TxInput[]) {
   return { imported: rows.length };
 }
 
+export async function updateTransaction(
+  id: string,
+  input: {
+    amountMinor?: number;
+    categoryId?: string | null;
+    date?: string;
+    note?: string;
+    accountId?: string;
+  }
+) {
+  const user = await requireUser();
+  await db
+    .update(finTransactions)
+    .set(input)
+    .where(and(eq(finTransactions.id, id), eq(finTransactions.userId, user.id)));
+  bump();
+}
+
+export async function deleteCategory(id: string) {
+  const user = await requireUser();
+  await db
+    .delete(finCategories)
+    .where(and(eq(finCategories.id, id), eq(finCategories.userId, user.id)));
+  bump();
+}
+
 export async function deleteTransaction(id: string) {
   const user = await requireUser();
   await db

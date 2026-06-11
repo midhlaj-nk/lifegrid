@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { createFinAccount, deleteFinAccount } from "@/actions/finance";
+import { useConfirm } from "@/components/ui/app-dialog";
 import { formatINR, toMinor } from "@/lib/money";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +29,7 @@ export function AccountsClient({ accounts }: { accounts: AccountRow[] }) {
   const [type, setType] = useState<(typeof TYPES)[number]["value"]>("bank");
   const [opening, setOpening] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   const total = accounts.reduce((s, a) => s + a.balanceMinor, 0);
 
@@ -123,15 +125,16 @@ export function AccountsClient({ accounts }: { accounts: AccountRow[] }) {
               {formatINR(a.balanceMinor)}
             </span>
             <button
-              onClick={() => {
-                if (
-                  confirm(
-                    `Delete "${a.name}"? All its transactions are deleted too.`
-                  )
-                )
-                  startTransition(() => deleteFinAccount(a.id));
+              onClick={async () => {
+                const ok = await confirm({
+                  title: `Delete "${a.name}"?`,
+                  description: "All its transactions are deleted too.",
+                  confirmLabel: "Delete",
+                  danger: true,
+                });
+                if (ok) startTransition(() => deleteFinAccount(a.id));
               }}
-              className="hidden text-muted-foreground hover:text-red-500 group-hover:block"
+              className="hidden text-muted-foreground hover:text-red-500 group-hover:block touch:block"
               aria-label="Delete account"
             >
               <Trash2 className="h-4 w-4" />

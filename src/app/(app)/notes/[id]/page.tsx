@@ -6,7 +6,7 @@ import { db } from "@/db";
 import { notes, noteTaskLinks, tasks } from "@/db/schema";
 import { requireUser } from "@/lib/session";
 import { NoteEditor } from "@/components/notes/note-editor";
-import { NoteHeader, LinkedTasks } from "./note-client";
+import { NoteHeader, LinkedTasks, MoveNoteButton } from "./note-client";
 
 export default async function NotePage({
   params,
@@ -22,7 +22,7 @@ export default async function NotePage({
     .where(and(eq(notes.id, id), eq(notes.userId, user.id)));
   if (!note) notFound();
 
-  const [children, links, openTasks] = await Promise.all([
+  const [children, links, openTasks, allNotes] = await Promise.all([
     db
       .select({ id: notes.id, title: notes.title, icon: notes.icon })
       .from(notes)
@@ -37,6 +37,15 @@ export default async function NotePage({
       .from(tasks)
       .where(and(eq(tasks.userId, user.id)))
       .orderBy(asc(tasks.createdAt)),
+    db
+      .select({
+        id: notes.id,
+        title: notes.title,
+        icon: notes.icon,
+        parentId: notes.parentId,
+      })
+      .from(notes)
+      .where(eq(notes.userId, user.id)),
   ]);
 
   const linkedIds = links.map((l) => l.taskId);
@@ -71,6 +80,9 @@ export default async function NotePage({
             </Link>
           </span>
         ))}
+        <span className="ml-auto">
+          <MoveNoteButton noteId={note.id} allNotes={allNotes} />
+        </span>
       </nav>
 
       <NoteHeader noteId={note.id} initialTitle={note.title} initialIcon={note.icon} />

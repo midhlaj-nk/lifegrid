@@ -1,7 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useChat } from "@ai-sdk/react";
+import type { UIMessage } from "ai";
+
+const STORAGE_KEY = "assistant-chat-v1";
+
+function loadStored(): UIMessage[] {
+  if (typeof window === "undefined") return [];
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
+  } catch {
+    return [];
+  }
+}
 import { Bot, Loader2, Send, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -14,8 +26,20 @@ const SUGGESTIONS = [
 
 export default function AssistantPage() {
   const [input, setInput] = useState("");
-  const { messages, sendMessage, status, error } = useChat();
+  const { messages, sendMessage, status, error, setMessages } = useChat();
   const busy = status === "submitted" || status === "streaming";
+
+  useEffect(() => {
+    const stored = loadStored();
+    if (stored.length) setMessages(stored);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (messages.length && status === "ready") {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-40)));
+    }
+  }, [messages, status]);
 
   function send(text: string) {
     const t = text.trim();
@@ -26,11 +50,24 @@ export default function AssistantPage() {
 
   return (
     <div className="flex h-[calc(100dvh-8rem)] flex-col">
-      <header className="mb-3">
-        <h1 className="text-xl font-semibold tracking-tight">Assistant</h1>
-        <p className="text-sm text-muted-foreground">
-          Asks your tasks, notes, and finance — vault excluded by design
-        </p>
+      <header className="mb-3 flex items-start justify-between">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight">Assistant</h1>
+          <p className="text-sm text-muted-foreground">
+            Asks your tasks, notes, and finance — vault excluded by design
+          </p>
+        </div>
+        {messages.length > 0 && (
+          <button
+            onClick={() => {
+              setMessages([]);
+              localStorage.removeItem(STORAGE_KEY);
+            }}
+            className="rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent"
+          >
+            Clear chat
+          </button>
+        )}
       </header>
 
       <div className="flex-1 space-y-4 overflow-y-auto pb-4">

@@ -142,3 +142,19 @@ export async function setTaskStatus(
     .where(and(eq(tasks.id, id), eq(tasks.userId, user.id)));
   revalidateTaskViews();
 }
+
+/** Move a task into a kanban column. "done" completes; others reopen. */
+export async function setTaskKanbanColumn(id: string, column: string) {
+  const user = await requireUser();
+  const done = column === "done";
+  await db
+    .update(tasks)
+    .set({
+      kanbanColumn: done ? null : column,
+      status: done ? "done" : "todo",
+      completedAt: done ? new Date() : null,
+      updatedAt: new Date(),
+    })
+    .where(and(eq(tasks.id, id), eq(tasks.userId, user.id)));
+  revalidateTaskViews();
+}

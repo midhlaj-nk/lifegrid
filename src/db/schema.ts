@@ -84,6 +84,8 @@ export const projects = pgTable("projects", {
   color: text("color").notNull().default("#8b5cf6"),
   sortOrder: integer("sort_order").notNull().default(0),
   archived: boolean("archived").notNull().default(false),
+  // JSON [{key,label}] — custom kanban stages; empty = default todo/doing/done
+  kanbanColumns: text("kanban_columns").notNull().default(""),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

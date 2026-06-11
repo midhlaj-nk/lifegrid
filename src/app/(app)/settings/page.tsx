@@ -1,6 +1,6 @@
 import { requireUser } from "@/lib/session";
 import { getAiSettingsSafe } from "@/actions/ai-settings";
-import { ProfileForm, SignOutButton } from "./settings-client";
+import { ProfileForm, SignOutButton, SessionsManager } from "./settings-client";
 import { AiSettingsForm } from "./ai-settings-form";
 
 export default async function SettingsPage() {
@@ -25,9 +25,10 @@ export default async function SettingsPage() {
       </section>
 
       <section className="space-y-3 rounded-lg border border-border p-4">
-        <h2 className="text-sm font-semibold">Session</h2>
-        <p className="text-xs text-muted-foreground">
-          Signs you out on this device.
+        <h2 className="text-sm font-semibold">Sessions</h2>
+        <SessionsManager />
+        <p className="pt-2 text-xs text-muted-foreground">
+          Sign out on this device:
         </p>
         <SignOutButton />
       </section>

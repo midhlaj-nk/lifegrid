@@ -431,7 +431,7 @@ export function ImportClient({
               </span>
               <button
                 onClick={() => startTransition(() => deleteRule(r.id))}
-                className="hidden text-muted-foreground hover:text-red-500 group-hover:block"
+                className="hidden text-muted-foreground hover:text-red-500 group-hover:block touch:block"
                 aria-label="Delete rule"
               >
                 <Trash2 className="h-3.5 w-3.5" />

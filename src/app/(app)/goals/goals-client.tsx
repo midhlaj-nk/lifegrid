@@ -10,6 +10,7 @@ import {
   linkTaskToGoal,
   unlinkTaskFromGoal,
 } from "@/actions/goals";
+import { useConfirm } from "@/components/ui/app-dialog";
 import { cn } from "@/lib/utils";
 
 interface GoalTask {
@@ -131,6 +132,7 @@ export function GoalsBoard({
 
 function GoalCard({ goal, allTasks }: { goal: GoalRow; allTasks: GoalTask[] }) {
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
   const [picking, setPicking] = useState(false);
   const [query, setQuery] = useState("");
 
@@ -178,9 +180,13 @@ function GoalCard({ goal, allTasks }: { goal: GoalRow; allTasks: GoalTask[] }) {
             </button>
           )}
           <button
-            onClick={() => {
-              if (confirm(`Delete goal "${goal.title}"?`))
-                startTransition(() => deleteGoal(goal.id));
+            onClick={async () => {
+              const ok = await confirm({
+                title: `Delete goal "${goal.title}"?`,
+                confirmLabel: "Delete",
+                danger: true,
+              });
+              if (ok) startTransition(() => deleteGoal(goal.id));
             }}
             className="rounded p-1 text-muted-foreground hover:text-red-500"
             aria-label="Delete goal"

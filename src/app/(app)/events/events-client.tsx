@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { format, parseISO } from "date-fns";
-import { CalendarPlus, Repeat, Trash2 } from "lucide-react";
-import { createEvent, deleteEvent } from "@/actions/events";
+import { CalendarPlus, Pencil, Repeat, Trash2 } from "lucide-react";
+import { createEvent, deleteEvent, updateEvent } from "@/actions/events";
+import { useConfirm, AppModal } from "@/components/ui/app-dialog";
 import { countdownLabel } from "@/lib/events";
 import { cn } from "@/lib/utils";
 
@@ -119,6 +120,8 @@ interface EventRow {
 
 export function EventList({ events }: { events: EventRow[] }) {
   const [pending, startTransition] = useTransition();
+  const [editing, setEditing] = useState<EventRow | null>(null);
+  const confirm = useConfirm();
 
   if (!events.length) {
     return (
@@ -160,14 +163,125 @@ export function EventList({ events }: { events: EventRow[] }) {
             {countdownLabel(e.days)}
           </span>
           <button
-            onClick={() => startTransition(() => deleteEvent(e.id))}
-            className="hidden text-muted-foreground hover:text-red-500 group-hover:block"
+            onClick={() => setEditing(e)}
+            className="hidden text-muted-foreground hover:text-foreground group-hover:block touch:block"
+            aria-label="Edit event"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button
+            onClick={async () => {
+              const ok = await confirm({
+                title: `Delete event "${e.title}"?`,
+                confirmLabel: "Delete",
+                danger: true,
+              });
+              if (ok) startTransition(() => deleteEvent(e.id));
+            }}
+            className="hidden text-muted-foreground hover:text-red-500 group-hover:block touch:block"
             aria-label="Delete event"
           >
             <Trash2 className="h-4 w-4" />
           </button>
         </div>
       ))}
+      {editing && <EditEventDialog event={editing} onClose={() => setEditing(null)} />}
     </div>
+  );
+}
+
+function EditEventDialog({
+  event,
+  onClose,
+}: {
+  event: EventRow;
+  onClose: () => void;
+}) {
+  const [title, setTitle] = useState(event.title);
+  const [date, setDate] = useState(event.nextDate);
+  const [yearly, setYearly] = useState(event.yearlyRecurring);
+  const [icon, setIcon] = useState(event.icon);
+  const [color, setColor] = useState(event.color);
+  const [pending, startTransition] = useTransition();
+
+  return (
+    <AppModal open onClose={onClose} title="Edit event">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!title.trim() || !date) return;
+          startTransition(async () => {
+            await updateEvent(event.id, {
+              title: title.trim(),
+              date,
+              yearlyRecurring: yearly,
+              icon,
+              color,
+            });
+            onClose();
+          });
+        }}
+        className="space-y-3"
+      >
+        <div className="flex gap-2">
+          <input
+            value={icon}
+            onChange={(e) => setIcon(e.target.value)}
+            className="h-9 w-12 rounded-md border border-input bg-background text-center text-sm outline-none"
+            aria-label="Emoji"
+          />
+          <input
+            autoFocus
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          />
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm outline-none"
+          />
+          <label className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={yearly}
+              onChange={(e) => setYearly(e.target.checked)}
+              className="h-4 w-4"
+            />
+            <Repeat className="h-3.5 w-3.5" /> Repeats yearly
+          </label>
+          <div className="flex gap-1.5">
+            {COLORS.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setColor(c)}
+                className={cn("h-5 w-5 rounded-full", color === c && "ring-2 ring-offset-2 ring-offset-background")}
+                style={{ backgroundColor: c, ["--tw-ring-color" as string]: c }}
+                aria-label={`Color ${c}`}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-9 rounded-md border border-border px-4 text-sm hover:bg-accent"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={pending || !title.trim() || !date}
+            className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-50"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </AppModal>
   );
 }

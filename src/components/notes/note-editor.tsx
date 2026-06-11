@@ -52,6 +52,7 @@ export function NoteEditor({
   });
 
   const [aiBusy, setAiBusy] = useState<string | null>(null);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
 
   useEffect(() => {
     return () => {
@@ -59,7 +60,7 @@ export function NoteEditor({
     };
   }, []);
 
-  async function runAi(command: string) {
+  async function runAi(command: string, lang?: string) {
     const plain = editor.document
       .map((b) =>
         Array.isArray(b.content)
@@ -71,12 +72,6 @@ export function NoteEditor({
       .join("\n")
       .trim();
     if (!plain) return toast.error("Note is empty");
-
-    let lang: string | null = null;
-    if (command === "translate") {
-      lang = prompt("Translate to which language?", "Malayalam");
-      if (!lang) return;
-    }
 
     setAiBusy(command);
     try {
@@ -117,7 +112,7 @@ export function NoteEditor({
     <div className="space-y-2">
       <div className="flex flex-wrap items-center gap-1">
         <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
-        {AI_COMMANDS.map((c) => (
+        {AI_COMMANDS.filter((c) => c.key !== "translate").map((c) => (
           <button
             key={c.key}
             onClick={() => runAi(c.key)}
@@ -128,16 +123,39 @@ export function NoteEditor({
             {c.label}
           </button>
         ))}
+        <select
+          disabled={aiBusy !== null}
+          value=""
+          onChange={(e) => e.target.value && runAi("translate", e.target.value)}
+          className="rounded-full border border-border bg-transparent px-2 py-1 text-[11px] text-muted-foreground outline-none disabled:opacity-50"
+        >
+          <option value="">Translate…</option>
+          {["Malayalam", "Hindi", "English", "Arabic", "Tamil"].map((l) => (
+            <option key={l} value={l}>
+              {l}
+            </option>
+          ))}
+        </select>
+        <span className="ml-auto text-[11px] text-muted-foreground">
+          {saveState === "saving" ? "Saving…" : saveState === "saved" ? "Saved ✓" : ""}
+        </span>
       </div>
       <BlockNoteView
         editor={editor}
         theme={resolvedTheme === "dark" ? "dark" : "light"}
         onChange={() => {
+          setSaveState("saving");
           if (saveTimer.current) clearTimeout(saveTimer.current);
           saveTimer.current = setTimeout(() => {
             updateNote(noteId, {
               content: JSON.stringify(editor.document),
-            }).catch(console.error);
+            })
+              .then(() => setSaveState("saved"))
+              .catch((e) => {
+                console.error(e);
+                toast.error("Save failed — copy your text");
+                setSaveState("idle");
+              });
           }, 800);
         }}
       />

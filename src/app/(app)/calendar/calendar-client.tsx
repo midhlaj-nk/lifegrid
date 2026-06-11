@@ -41,14 +41,21 @@ export function CalendarView({
   events: CalEvent[];
 }) {
   const [cursor, setCursor] = useState(() => new Date());
+  const [view, setView] = useState<"month" | "week">("month");
   const [dragId, setDragId] = useState<string | null>(null);
   const [addingFor, setAddingFor] = useState<string | null>(null);
   const [newTitle, setNewTitle] = useState("");
   const [pending, startTransition] = useTransition();
 
   const monthStart = startOfMonth(cursor);
-  const gridStart = startOfWeek(monthStart, { weekStartsOn: 1 });
-  const gridEnd = endOfWeek(endOfMonth(cursor), { weekStartsOn: 1 });
+  const gridStart =
+    view === "month"
+      ? startOfWeek(monthStart, { weekStartsOn: 1 })
+      : startOfWeek(cursor, { weekStartsOn: 1 });
+  const gridEnd =
+    view === "month"
+      ? endOfWeek(endOfMonth(cursor), { weekStartsOn: 1 })
+      : endOfWeek(cursor, { weekStartsOn: 1 });
 
   const days: Date[] = [];
   for (let d = gridStart; d <= gridEnd; d = addDays(d, 1)) days.push(d);
@@ -65,10 +72,30 @@ export function CalendarView({
   return (
     <div className={cn(pending && "opacity-70")}>
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-sm font-semibold">{format(cursor, "MMMM yyyy")}</h2>
+        <h2 className="text-sm font-semibold">
+          {view === "month"
+            ? format(cursor, "MMMM yyyy")
+            : `${format(gridStart, "d MMM")} – ${format(gridEnd, "d MMM yyyy")}`}
+        </h2>
         <div className="flex items-center gap-1">
+          <div className="mr-2 flex rounded-md border border-border p-0.5">
+            {(["month", "week"] as const).map((v) => (
+              <button
+                key={v}
+                onClick={() => setView(v)}
+                className={cn(
+                  "rounded px-2 py-0.5 text-xs capitalize",
+                  view === v ? "bg-accent font-medium" : "text-muted-foreground"
+                )}
+              >
+                {v}
+              </button>
+            ))}
+          </div>
           <button
-            onClick={() => setCursor((c) => addMonths(c, -1))}
+            onClick={() =>
+              setCursor((c) => (view === "month" ? addMonths(c, -1) : addDays(c, -7)))
+            }
             className="rounded-md p-1.5 hover:bg-accent"
             aria-label="Previous month"
           >
@@ -81,9 +108,11 @@ export function CalendarView({
             Today
           </button>
           <button
-            onClick={() => setCursor((c) => addMonths(c, 1))}
+            onClick={() =>
+              setCursor((c) => (view === "month" ? addMonths(c, 1) : addDays(c, 7)))
+            }
             className="rounded-md p-1.5 hover:bg-accent"
-            aria-label="Next month"
+            aria-label="Next"
           >
             <ChevronRight className="h-4 w-4" />
           </button>
@@ -116,8 +145,9 @@ export function CalendarView({
               onDragOver={(e) => e.preventDefault()}
               onDrop={() => dropOn(key)}
               className={cn(
-                "group min-h-20 bg-background p-1.5 align-top md:min-h-28",
-                !inMonth && "opacity-40"
+                "group bg-background p-1.5 align-top",
+                view === "week" ? "min-h-48 md:min-h-72" : "min-h-20 md:min-h-28",
+                view === "month" && !inMonth && "opacity-40"
               )}
             >
               <div className="mb-1 flex items-center justify-between">
@@ -134,7 +164,7 @@ export function CalendarView({
                     setAddingFor(key);
                     setNewTitle("");
                   }}
-                  className="hidden rounded p-0.5 text-muted-foreground hover:bg-accent group-hover:block"
+                  className="hidden rounded p-0.5 text-muted-foreground hover:bg-accent group-hover:block touch:block"
                   aria-label="Add task on this day"
                 >
                   <Plus className="h-3 w-3" />

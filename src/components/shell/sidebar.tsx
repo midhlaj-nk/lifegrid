@@ -9,6 +9,7 @@ import {
   Sparkles,
   CalendarRange,
   PartyPopper,
+  Pencil,
   CheckCircle2,
   ChevronDown,
   FileClock,
@@ -26,7 +27,12 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { CreateAreaDialog, CreateProjectDialog } from "./create-dialogs";
+import {
+  CreateAreaDialog,
+  CreateProjectDialog,
+  EditAreaDialog,
+  EditProjectDialog,
+} from "./create-dialogs";
 
 interface SidebarProps {
   areas: { id: string; name: string; color: string }[];
@@ -46,6 +52,8 @@ const smartLists = [
 export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [editingArea, setEditingArea] = useState<SidebarProps["areas"][number] | null>(null);
+  const [editingProject, setEditingProject] = useState<SidebarProps["projects"][number] | null>(null);
   const looseProjects = projects.filter((p) => !p.areaId);
 
   function navLink(href: string, label: string, dotColor?: string, Icon?: React.ComponentType<{ className?: string }>) {
@@ -142,12 +150,30 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
                   <div className="flex-1">
                     {navLink(`/area/${area.id}`, area.name, area.color)}
                   </div>
+                  <button
+                    onClick={() => setEditingArea(area)}
+                    className="hidden rounded p-0.5 text-muted-foreground hover:text-foreground group-hover:block touch:block"
+                    aria-label={`Edit ${area.name}`}
+                  >
+                    <Pencil className="h-3 w-3" />
+                  </button>
                 </div>
                 {!isCollapsed && areaProjects.length > 0 && (
                   <div className="ml-5 space-y-0.5 border-l border-border pl-2">
-                    {areaProjects.map((p) =>
-                      navLink(`/project/${p.id}`, p.name, p.color)
-                    )}
+                    {areaProjects.map((p) => (
+                      <div key={p.id} className="group/proj flex items-center">
+                        <div className="flex-1">
+                          {navLink(`/project/${p.id}`, p.name, p.color)}
+                        </div>
+                        <button
+                          onClick={() => setEditingProject(p)}
+                          className="hidden rounded p-0.5 text-muted-foreground hover:text-foreground group-hover/proj:block touch:block"
+                          aria-label={`Edit ${p.name}`}
+                        >
+                          <Pencil className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
@@ -168,9 +194,20 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
           </CreateProjectDialog>
         </div>
         <div className="space-y-0.5">
-          {looseProjects.map((p) =>
-            navLink(`/project/${p.id}`, p.name, p.color)
-          )}
+          {looseProjects.map((p) => (
+            <div key={p.id} className="group/proj flex items-center">
+              <div className="flex-1">
+                {navLink(`/project/${p.id}`, p.name, p.color)}
+              </div>
+              <button
+                onClick={() => setEditingProject(p)}
+                className="hidden rounded p-0.5 text-muted-foreground hover:text-foreground group-hover/proj:block touch:block"
+                aria-label={`Edit ${p.name}`}
+              >
+                <Pencil className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
           {looseProjects.length === 0 && (
             <p className="px-2.5 text-xs text-muted-foreground/60">
               Projects without an area appear here

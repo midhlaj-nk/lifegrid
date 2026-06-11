@@ -197,6 +197,16 @@ export function ReportsClient({
       <section className="rounded-lg border border-border bg-card p-4">
         <h3 className="mb-3 text-sm font-semibold">Cashflow calendar</h3>
         <div className="grid grid-cols-7 gap-1">
+          {["M", "T", "W", "T", "F", "S", "S"].map((d, i) => (
+            <div key={i} className="text-center text-[10px] text-muted-foreground">
+              {d}
+            </div>
+          ))}
+          {/* pad to Monday-start weekday of the 1st */}
+          {Array.from(
+            { length: (days[0].getDay() + 6) % 7 },
+            (_, i) => <div key={`pad-${i}`} />
+          )}
           {days.map((d) => {
             const key = format(d, "yyyy-MM-dd");
             const e = perDay.get(key);

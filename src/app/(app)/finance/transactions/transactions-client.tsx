@@ -3,9 +3,10 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { addMonths, format, parseISO } from "date-fns";
-import { ArrowLeftRight, ChevronLeft, ChevronRight, Trash2 } from "lucide-react";
+import { ArrowLeftRight, ChevronLeft, ChevronRight, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { createTransaction, deleteTransaction } from "@/actions/finance";
+import { createTransaction, deleteTransaction, updateTransaction } from "@/actions/finance";
+import { AppModal } from "@/components/ui/app-dialog";
 import { formatINR, toMinor } from "@/lib/money";
 import { cn } from "@/lib/utils";
 
@@ -54,6 +55,7 @@ export function TransactionsClient({
   const [foreign, setForeign] = useState(false);
   const [fxCurrency, setFxCurrency] = useState("USD");
   const [fxRate, setFxRate] = useState("");
+  const [editing, setEditing] = useState<Tx | null>(null);
   const [pending, startTransition] = useTransition();
 
   const visibleCategories = categories.filter((c) =>
@@ -316,9 +318,18 @@ export function TransactionsClient({
                     {t.type === "expense" ? "−" : t.type === "income" ? "+" : ""}
                     {formatINR(t.amountMinor)}
                   </span>
+                  {t.type !== "transfer" && (
+                    <button
+                      onClick={() => setEditing(t)}
+                      className="hidden text-muted-foreground hover:text-foreground group-hover:block touch:block"
+                      aria-label="Edit transaction"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                   <button
                     onClick={() => startTransition(() => deleteTransaction(t.id))}
-                    className="hidden text-muted-foreground hover:text-red-500 group-hover:block"
+                    className="hidden text-muted-foreground hover:text-red-500 group-hover:block touch:block"
                     aria-label="Delete transaction"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
@@ -329,6 +340,120 @@ export function TransactionsClient({
           </div>
         </div>
       ))}
+
+      {editing && (
+        <EditTxDialog
+          tx={editing}
+          accounts={accounts}
+          categories={categories}
+          onClose={() => setEditing(null)}
+        />
+      )}
     </div>
+  );
+}
+
+function EditTxDialog({
+  tx,
+  accounts,
+  categories,
+  onClose,
+}: {
+  tx: Tx;
+  accounts: Account[];
+  categories: Category[];
+  onClose: () => void;
+}) {
+  const [amount, setAmount] = useState(String(tx.amountMinor / 100));
+  const [accountId, setAccountId] = useState(tx.accountId);
+  const [categoryId, setCategoryId] = useState(tx.categoryId ?? "");
+  const [date, setDate] = useState(tx.date);
+  const [note, setNote] = useState(tx.note);
+  const [pending, startTransition] = useTransition();
+
+  const cats = categories.filter((c) =>
+    tx.type === "income" ? c.kind === "income" : c.kind === "expense"
+  );
+
+  return (
+    <AppModal open onClose={onClose} title="Edit transaction" wide>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (toMinor(amount) <= 0) return;
+          startTransition(async () => {
+            await updateTransaction(tx.id, {
+              amountMinor: toMinor(amount),
+              accountId,
+              categoryId: categoryId || null,
+              date,
+              note,
+            });
+            onClose();
+          });
+        }}
+        className="space-y-3"
+      >
+        <div className="flex flex-wrap gap-2">
+          <input
+            autoFocus
+            inputMode="decimal"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="h-9 w-28 rounded-md border border-input bg-background px-3 text-sm font-semibold tabular-nums outline-none"
+          />
+          <select
+            value={accountId}
+            onChange={(e) => setAccountId(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-2 text-sm outline-none"
+          >
+            {accounts.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-2 text-sm outline-none"
+          >
+            <option value="">No category</option>
+            {cats.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.icon} {c.name}
+              </option>
+            ))}
+          </select>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-2 text-sm outline-none"
+          />
+        </div>
+        <input
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Note"
+          className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none"
+        />
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-9 rounded-md border border-border px-4 text-sm hover:bg-accent"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={pending || toMinor(amount) <= 0}
+            className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-50"
+          >
+            Save
+          </button>
+        </div>
+      </form>
+    </AppModal>
   );
 }

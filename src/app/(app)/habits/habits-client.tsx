@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { addDays, format, subDays } from "date-fns";
-import { Check, Flame, Plus, Trash2 } from "lucide-react";
+import { BarChart3, Check, Flame, Plus, Trash2 } from "lucide-react";
 import { createHabit, deleteHabit, toggleHabitCheck } from "@/actions/habits";
+import { useConfirm } from "@/components/ui/app-dialog";
 import { cn } from "@/lib/utils";
 
 interface HabitRow {
@@ -38,7 +39,9 @@ export function HabitsBoard({ habits }: { habits: HabitRow[] }) {
   const [name, setName] = useState("");
   const [icon, setIcon] = useState("💪");
   const [days, setDays] = useState<number[]>([]);
+  const [heatmapFor, setHeatmapFor] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   const today = new Date();
   const last7 = Array.from({ length: 7 }, (_, i) => subDays(today, 6 - i));
@@ -133,11 +136,10 @@ export function HabitsBoard({ habits }: { habits: HabitRow[] }) {
       {habits.map((h) => {
         const checkSet = new Set(h.checks);
         const s = streak(checkSet, h.weekdays);
+        const showHeat = heatmapFor === h.id;
         return (
-          <div
-            key={h.id}
-            className="group flex items-center gap-3 rounded-lg border border-border bg-card p-3"
-          >
+          <div key={h.id} className="rounded-lg border border-border bg-card p-3">
+          <div className="group flex items-center gap-3">
             <span className="text-xl">{h.icon}</span>
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium">{h.name}</p>
@@ -184,18 +186,82 @@ export function HabitsBoard({ habits }: { habits: HabitRow[] }) {
               })}
             </div>
             <button
-              onClick={() => {
-                if (confirm(`Delete habit "${h.name}"?`))
-                  startTransition(() => deleteHabit(h.id));
+              onClick={() => setHeatmapFor(showHeat ? null : h.id)}
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="Toggle history"
+            >
+              <BarChart3 className="h-4 w-4" />
+            </button>
+            <button
+              onClick={async () => {
+                const ok = await confirm({
+                  title: `Delete habit "${h.name}"?`,
+                  description: "Its full history is deleted.",
+                  confirmLabel: "Delete",
+                  danger: true,
+                });
+                if (ok) startTransition(() => deleteHabit(h.id));
               }}
-              className="hidden text-muted-foreground hover:text-red-500 group-hover:block"
+              className="hidden text-muted-foreground hover:text-red-500 group-hover:block touch:block"
               aria-label="Delete habit"
             >
               <Trash2 className="h-4 w-4" />
             </button>
           </div>
+          {showHeat && <Heatmap checks={checkSet} color={h.color} weekdays={h.weekdays} />}
+          </div>
         );
       })}
+    </div>
+  );
+}
+
+
+function Heatmap({
+  checks,
+  color,
+  weekdays,
+}: {
+  checks: Set<string>;
+  color: string;
+  weekdays: number[];
+}) {
+  // last 12 weeks, columns = weeks, rows = Mon..Sun
+  const today = new Date();
+  const weeks: Date[][] = [];
+  // find this week's Monday
+  const monday = subDays(today, (today.getDay() + 6) % 7);
+  for (let w = 11; w >= 0; w--) {
+    const start = subDays(monday, w * 7);
+    weeks.push(Array.from({ length: 7 }, (_, i) => addDays(start, i)));
+  }
+  return (
+    <div className="mt-3 flex gap-1 overflow-x-auto border-t border-border pt-3">
+      {weeks.map((week, wi) => (
+        <div key={wi} className="flex flex-col gap-1">
+          {week.map((d) => {
+            const key = format(d, "yyyy-MM-dd");
+            const future = d > today;
+            const applies = !weekdays.length || weekdays.includes(d.getDay());
+            const checked = checks.has(key);
+            return (
+              <div
+                key={key}
+                title={format(d, "EEE d MMM")}
+                className="h-3.5 w-3.5 rounded-sm"
+                style={{
+                  backgroundColor: checked
+                    ? color
+                    : future || !applies
+                      ? "transparent"
+                      : "var(--accent)",
+                  opacity: future ? 0 : 1,
+                }}
+              />
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }

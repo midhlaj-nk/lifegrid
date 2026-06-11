@@ -12,6 +12,7 @@ import {
   deleteLent,
 } from "@/actions/finance";
 import { formatINR, toMinor } from "@/lib/money";
+import { useConfirm } from "@/components/ui/app-dialog";
 import { cn } from "@/lib/utils";
 
 const ACCOUNT_TYPE_ICON: Record<string, string> = {
@@ -157,7 +158,10 @@ function SavingsGoals({
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState("");
   const [target, setTarget] = useState("");
+  const [addingTo, setAddingTo] = useState<string | null>(null);
+  const [addValue, setAddValue] = useState("");
   const [pending, startTransition] = useTransition();
+  const confirmDialog = useConfirm();
 
   return (
     <Section
@@ -225,25 +229,48 @@ function SavingsGoals({
                     <span className="tabular-nums text-muted-foreground">
                       {formatINR(g.savedMinor)} / {formatINR(g.targetMinor)} ({pct}%)
                     </span>
+                    {addingTo === g.id ? (
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          if (toMinor(addValue) > 0)
+                            startTransition(() =>
+                              addToSavingsGoal(g.id, toMinor(addValue))
+                            );
+                          setAddingTo(null);
+                          setAddValue("");
+                        }}
+                        className="inline-flex"
+                      >
+                        <input
+                          autoFocus
+                          inputMode="decimal"
+                          placeholder="₹"
+                          value={addValue}
+                          onChange={(e) => setAddValue(e.target.value)}
+                          onBlur={() => setAddingTo(null)}
+                          className="h-5 w-16 rounded border border-input bg-background px-1 text-[11px] outline-none"
+                        />
+                      </form>
+                    ) : (
+                      <button
+                        onClick={() => setAddingTo(g.id)}
+                        className="text-muted-foreground hover:text-foreground"
+                        aria-label="Add savings"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </button>
+                    )}
                     <button
-                      onClick={() => {
-                        const amt = prompt("Add amount (₹):");
-                        if (amt)
-                          startTransition(() =>
-                            addToSavingsGoal(g.id, toMinor(amt))
-                          );
+                      onClick={async () => {
+                        const ok = await confirmDialog({
+                          title: `Delete goal "${g.name}"?`,
+                          confirmLabel: "Delete",
+                          danger: true,
+                        });
+                        if (ok) startTransition(() => deleteSavingsGoal(g.id));
                       }}
-                      className="text-muted-foreground hover:text-foreground"
-                      aria-label="Add savings"
-                    >
-                      <Plus className="h-3 w-3" />
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (confirm(`Delete goal "${g.name}"?`))
-                          startTransition(() => deleteSavingsGoal(g.id));
-                      }}
-                      className="hidden text-muted-foreground hover:text-red-500 group-hover:block"
+                      className="hidden text-muted-foreground hover:text-red-500 group-hover:block touch:block"
                       aria-label="Delete goal"
                     >
                       <Trash2 className="h-3 w-3" />
@@ -368,7 +395,7 @@ function LentBorrowed({
               </button>
               <button
                 onClick={() => startTransition(() => deleteLent(l.id))}
-                className="hidden text-muted-foreground hover:text-red-500 group-hover:block"
+                className="hidden text-muted-foreground hover:text-red-500 group-hover:block touch:block"
                 aria-label="Delete entry"
               >
                 <Trash2 className="h-3.5 w-3.5" />

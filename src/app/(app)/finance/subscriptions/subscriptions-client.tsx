@@ -8,6 +8,7 @@ import {
   updateSubscription,
   deleteSubscription,
 } from "@/actions/finance";
+import { useConfirm } from "@/components/ui/app-dialog";
 import { formatINR, toMinor } from "@/lib/money";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +41,7 @@ export function SubscriptionsClient({
   const [cadence, setCadence] = useState<"weekly" | "monthly" | "yearly">("monthly");
   const [nextDue, setNextDue] = useState(format(new Date(), "yyyy-MM-dd"));
   const [pending, startTransition] = useTransition();
+  const confirm = useConfirm();
 
   const yearlyTotal = subscriptions
     .filter((s) => s.active)
@@ -182,11 +184,15 @@ export function SubscriptionsClient({
               {s.active ? "Pause" : "Resume"}
             </button>
             <button
-              onClick={() => {
-                if (confirm(`Delete subscription "${s.name}"?`))
-                  startTransition(() => deleteSubscription(s.id));
+              onClick={async () => {
+                const ok = await confirm({
+                  title: `Delete subscription "${s.name}"?`,
+                  confirmLabel: "Delete",
+                  danger: true,
+                });
+                if (ok) startTransition(() => deleteSubscription(s.id));
               }}
-              className="hidden text-muted-foreground hover:text-red-500 group-hover:block"
+              className="hidden text-muted-foreground hover:text-red-500 group-hover:block touch:block"
               aria-label="Delete subscription"
             >
               <Trash2 className="h-4 w-4" />

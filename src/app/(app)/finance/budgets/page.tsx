@@ -15,6 +15,7 @@ export default async function BudgetsPage() {
     <BudgetsClient
       budgets={budgets}
       categories={categories.filter((c) => c.kind === "expense")}
+      allCategories={categories}
     />
   );
 }
