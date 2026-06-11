@@ -7,6 +7,7 @@ import { notes, noteTaskLinks, tasks } from "@/db/schema";
 import { requireUser } from "@/lib/session";
 import { NoteEditor } from "@/components/notes/note-editor";
 import { NoteHeader, LinkedTasks, MoveNoteButton } from "./note-client";
+import { NoteCover } from "@/components/cover-clients";
 
 export default async function NotePage({
   params,
@@ -68,6 +69,7 @@ export default async function NotePage({
 
   return (
     <div className="space-y-4">
+      <NoteCover noteId={note.id} cover={note.cover} />
       <nav className="flex items-center gap-1 text-xs text-muted-foreground">
         <Link href="/notes" className="hover:text-foreground">
           Notes

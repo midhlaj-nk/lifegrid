@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/session";
 import { getAiSettingsSafe } from "@/actions/ai-settings";
 import { ProfileForm, SignOutButton, SessionsManager } from "./settings-client";
 import { AiSettingsForm } from "./ai-settings-form";
+import { AppearanceForm } from "./appearance-form";
 
 export default async function SettingsPage() {
   const user = await requireUser();
@@ -17,6 +18,11 @@ export default async function SettingsPage() {
       <section className="space-y-4 rounded-lg border border-border p-4">
         <h2 className="text-sm font-semibold">Profile</h2>
         <ProfileForm initialName={user.name} email={user.email} />
+      </section>
+
+      <section className="space-y-4 rounded-lg border border-border p-4">
+        <h2 className="text-sm font-semibold">Appearance</h2>
+        <AppearanceForm />
       </section>
 
       <section className="space-y-4 rounded-lg border border-border p-4">

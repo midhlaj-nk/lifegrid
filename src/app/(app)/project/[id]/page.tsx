@@ -8,6 +8,7 @@ import { requireUser } from "@/lib/session";
 import { getProjectTasks } from "@/lib/queries";
 import { QuickAdd } from "@/components/tasks/quick-add";
 import { TaskList, Section } from "@/components/tasks/task-list";
+import { ProjectCover } from "@/components/cover-clients";
 
 export default async function ProjectPage({
   params,
@@ -29,6 +30,7 @@ export default async function ProjectPage({
 
   return (
     <div className="space-y-6">
+      <ProjectCover projectId={id} cover={project.cover} />
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span

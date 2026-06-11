@@ -70,6 +70,7 @@ export const areas = pgTable("areas", {
   name: text("name").notNull(),
   color: text("color").notNull().default("#6366f1"),
   icon: text("icon").notNull().default("folder"),
+  cover: text("cover").notNull().default(""),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -86,6 +87,7 @@ export const projects = pgTable("projects", {
   archived: boolean("archived").notNull().default(false),
   // JSON [{key,label}] — custom kanban stages; empty = default todo/doing/done
   kanbanColumns: text("kanban_columns").notNull().default(""),
+  cover: text("cover").notNull().default(""),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -388,6 +390,8 @@ export const notes = pgTable("notes", {
   parentId: text("parent_id"),
   title: text("title").notNull().default("Untitled"),
   icon: text("icon").notNull().default("📄"),
+  // "gradient:<n>" preset or an uploaded image URL
+  cover: text("cover").notNull().default(""),
   // BlockNote document JSON
   content: text("content").notNull().default("[]"),
   sortOrder: integer("sort_order").notNull().default(0),

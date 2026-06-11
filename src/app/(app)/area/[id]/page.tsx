@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/session";
 import { getAreaTasks } from "@/lib/queries";
 import { QuickAdd } from "@/components/tasks/quick-add";
 import { TaskList, Section } from "@/components/tasks/task-list";
+import { AreaCover } from "@/components/cover-clients";
 
 export default async function AreaPage({
   params,
@@ -32,6 +33,7 @@ export default async function AreaPage({
 
   return (
     <div className="space-y-6">
+      <AreaCover areaId={id} cover={area.cover} />
       <header className="flex items-center gap-2">
         <span
           className="h-3 w-3 rounded-full"

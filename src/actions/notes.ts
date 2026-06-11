@@ -25,7 +25,7 @@ export async function createNote(input: {
 
 export async function updateNote(
   id: string,
-  input: { title?: string; icon?: string; content?: string; parentId?: string | null }
+  input: { title?: string; icon?: string; content?: string; parentId?: string | null; cover?: string }
 ) {
   const user = await requireUser();
   await db
@@ -33,7 +33,12 @@ export async function updateNote(
     .set({ ...input, updatedAt: new Date() })
     .where(and(eq(notes.id, id), eq(notes.userId, user.id)));
   // content saves happen on a debounce — skip revalidate for those
-  if (input.title !== undefined || input.icon !== undefined || input.parentId !== undefined) {
+  if (
+    input.title !== undefined ||
+    input.icon !== undefined ||
+    input.parentId !== undefined ||
+    input.cover !== undefined
+  ) {
     revalidatePath("/notes", "layout");
   }
 }

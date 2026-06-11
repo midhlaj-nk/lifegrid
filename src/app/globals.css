@@ -83,6 +83,39 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* ---------- accent themes (html[data-accent]) ---------- */
+
+[data-accent="indigo"] {
+  --primary: oklch(0.585 0.233 277);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.585 0.233 277);
+}
+[data-accent="emerald"] {
+  --primary: oklch(0.596 0.145 163);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.596 0.145 163);
+}
+[data-accent="rose"] {
+  --primary: oklch(0.645 0.215 16);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.645 0.215 16);
+}
+[data-accent="amber"] {
+  --primary: oklch(0.769 0.155 70);
+  --primary-foreground: oklch(0.21 0.04 60);
+  --ring: oklch(0.769 0.155 70);
+}
+[data-accent="violet"] {
+  --primary: oklch(0.606 0.25 293);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.606 0.25 293);
+}
+[data-accent="sky"] {
+  --primary: oklch(0.685 0.148 237);
+  --primary-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.685 0.148 237);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

@@ -25,7 +25,7 @@ export async function createArea(input: { name: string; color?: string; icon?: s
   return id;
 }
 
-export async function updateArea(id: string, input: { name?: string; color?: string; icon?: string }) {
+export async function updateArea(id: string, input: { name?: string; color?: string; icon?: string; cover?: string }) {
   const user = await requireUser();
   await db
     .update(areas)
@@ -33,6 +33,7 @@ export async function updateArea(id: string, input: { name?: string; color?: str
       ...(input.name ? { name: name.parse(input.name) } : {}),
       ...(input.color ? { color: color.parse(input.color) } : {}),
       ...(input.icon ? { icon: input.icon } : {}),
+      ...(input.cover !== undefined ? { cover: input.cover } : {}),
     })
     .where(and(eq(areas.id, id), eq(areas.userId, user.id)));
   revalidatePath("/", "layout");
@@ -58,7 +59,7 @@ export async function createProject(input: { name: string; areaId?: string | nul
   return id;
 }
 
-export async function updateProject(id: string, input: { name?: string; areaId?: string | null; color?: string; archived?: boolean; kanbanColumns?: string }) {
+export async function updateProject(id: string, input: { name?: string; areaId?: string | null; color?: string; archived?: boolean; kanbanColumns?: string; cover?: string }) {
   const user = await requireUser();
   await db
     .update(projects)
@@ -68,6 +69,7 @@ export async function updateProject(id: string, input: { name?: string; areaId?:
       ...(input.areaId !== undefined ? { areaId: input.areaId } : {}),
       ...(input.archived !== undefined ? { archived: input.archived } : {}),
       ...(input.kanbanColumns !== undefined ? { kanbanColumns: input.kanbanColumns } : {}),
+      ...(input.cover !== undefined ? { cover: input.cover } : {}),
     })
     .where(and(eq(projects.id, id), eq(projects.userId, user.id)));
   revalidatePath("/", "layout");
