@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Inbox, Menu, Sun, CheckCircle2 } from "lucide-react";
+import { CalendarDays, Inbox, LayoutDashboard, Menu, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { href: "/", label: "Today", icon: Sun },
+  { href: "/", label: "Home", icon: LayoutDashboard },
+  { href: "/today", label: "Today", icon: Sun },
   { href: "/upcoming", label: "Upcoming", icon: CalendarDays },
   { href: "/inbox", label: "Inbox", icon: Inbox },
-  { href: "/completed", label: "Done", icon: CheckCircle2 },
 ];
 
 export function MobileBottomNav({ onMenu }: { onMenu: () => void }) {

@@ -127,6 +127,73 @@ export const tasks = pgTable("tasks", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ---------- Habits ----------
+
+export const habits = pgTable("habits", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  icon: text("icon").notNull().default("✅"),
+  color: text("color").notNull().default("#10b981"),
+  // weekdays the habit applies to, 0=Sun..6=Sat; empty = every day
+  weekdays: text("weekdays").notNull().default("[]"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const habitChecks = pgTable(
+  "habit_checks",
+  {
+    habitId: text("habit_id")
+      .notNull()
+      .references(() => habits.id, { onDelete: "cascade" }),
+    date: date("date").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.habitId, t.date] })]
+);
+
+// ---------- Goals ----------
+
+export const goals = pgTable("goals", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description").notNull().default(""),
+  targetDate: date("target_date"),
+  // manual progress 0-100; if linked tasks exist, progress derives from them
+  manualProgress: integer("manual_progress").notNull().default(0),
+  status: text("status", { enum: ["active", "achieved", "dropped"] })
+    .notNull()
+    .default("active"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const goalTaskLinks = pgTable(
+  "goal_task_links",
+  {
+    goalId: text("goal_id")
+      .notNull()
+      .references(() => goals.id, { onDelete: "cascade" }),
+    taskId: text("task_id")
+      .notNull()
+      .references(() => tasks.id, { onDelete: "cascade" }),
+  },
+  (t) => [primaryKey({ columns: [t.goalId, t.taskId] })]
+);
+
+// ---------- Dashboard preferences ----------
+
+export const dashboardPrefs = pgTable("dashboard_prefs", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  // JSON array of {key, enabled} in display order
+  widgets: text("widgets").notNull().default("[]"),
+});
+
 // ---------- Events / countdowns ----------
 
 export const events = pgTable("events", {

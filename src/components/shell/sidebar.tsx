@@ -11,7 +11,10 @@ import {
   ChevronDown,
   FileClock,
   FileText,
+  Flame,
   Inbox,
+  LayoutDashboard,
+  Target,
   Plus,
   Settings2,
   Sun,
@@ -29,7 +32,8 @@ interface SidebarProps {
 }
 
 const smartLists = [
-  { href: "/", label: "Today", icon: Sun },
+  { href: "/", label: "Home", icon: LayoutDashboard },
+  { href: "/today", label: "Today", icon: Sun },
   { href: "/upcoming", label: "Upcoming", icon: CalendarDays },
   { href: "/inbox", label: "Inbox", icon: Inbox },
   { href: "/completed", label: "Completed", icon: CheckCircle2 },
@@ -77,6 +81,8 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
         {navLink("/notes", "Notes", undefined, FileText)}
         {navLink("/calendar", "Calendar", undefined, CalendarRange)}
         {navLink("/events", "Events", undefined, PartyPopper)}
+        {navLink("/habits", "Habits", undefined, Flame)}
+        {navLink("/goals", "Goals", undefined, Target)}
       </div>
 
       <div>
