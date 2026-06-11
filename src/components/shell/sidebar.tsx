@@ -3,8 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Bot,
   Briefcase,
   CalendarDays,
+  Sparkles,
   CalendarRange,
   PartyPopper,
   CheckCircle2,
@@ -87,6 +89,8 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
         {navLink("/goals", "Goals", undefined, Target)}
         {navLink("/vault", "Vault", undefined, ShieldCheck)}
         {navLink("/finance", "Finance", undefined, Wallet)}
+        {navLink("/assistant", "Assistant", undefined, Bot)}
+        {navLink("/insights", "Insights", undefined, Sparkles)}
       </div>
 
       <div>

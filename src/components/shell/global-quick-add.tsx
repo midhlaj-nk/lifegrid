@@ -1,15 +1,19 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { CalendarDays, Flag, Hash, Repeat, Zap } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { CalendarDays, Flag, Hash, Repeat, Sparkles, Zap } from "lucide-react";
+import { toast } from "sonner";
 import { quickAddTask } from "@/actions/quick-add";
 import { parseQuickAdd } from "@/lib/nl-parse";
 import { describeRecurrence } from "@/lib/recurrence";
 import { cn } from "@/lib/utils";
 
 export function GlobalQuickAdd() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
+  const [aiBusy, setAiBusy] = useState(false);
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -108,12 +112,43 @@ export function GlobalQuickAdd() {
             <span className="text-[11px] text-muted-foreground">
               Ctrl/⌘+K to toggle · Enter to add
             </span>
-            <button
-              disabled={pending || !text.trim()}
-              className="h-8 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground disabled:opacity-50"
-            >
-              Add task
-            </button>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                disabled={aiBusy || !text.trim()}
+                onClick={async () => {
+                  setAiBusy(true);
+                  try {
+                    const res = await fetch("/api/ai/capture", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ text }),
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || "AI capture failed");
+                    toast.success(`Created ${data.created}: ${data.item.title}`);
+                    setText("");
+                    setOpen(false);
+                    router.refresh();
+                  } catch (e) {
+                    toast.error((e as Error).message);
+                  } finally {
+                    setAiBusy(false);
+                  }
+                }}
+                className="inline-flex h-8 items-center gap-1 rounded-md border border-border px-3 text-xs font-medium text-muted-foreground hover:bg-accent disabled:opacity-50"
+                title="AI decides: task, expense, or event"
+              >
+                <Sparkles className="h-3 w-3" />
+                {aiBusy ? "Parsing…" : "AI capture"}
+              </button>
+              <button
+                disabled={pending || !text.trim()}
+                className="h-8 rounded-md bg-primary px-3 text-xs font-medium text-primary-foreground disabled:opacity-50"
+              >
+                Add task
+              </button>
+            </div>
           </div>
         </form>
       </div>

@@ -91,6 +91,7 @@ export function ImportClient({
   const [creditCol, setCreditCol] = useState(3);
   const [hasHeader, setHasHeader] = useState(true);
   const [preview, setPreview] = useState<PreviewRow[] | null>(null);
+  const [aiBusy, setAiBusy] = useState(false);
   const [pending, startTransition] = useTransition();
 
   // rules manager state
@@ -266,13 +267,54 @@ export function ImportClient({
             <h3 className="text-sm font-semibold">
               3 · Review ({preview.filter((p) => p.include).length} selected)
             </h3>
-            <button
-              onClick={doImport}
-              disabled={pending || !preview.some((p) => p.include)}
-              className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-50"
-            >
-              {pending ? "Importing…" : "Import"}
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={async () => {
+                  const uncategorized = preview
+                    .map((p, i) => ({ p, i }))
+                    .filter((x) => x.p.include && !x.p.categoryId && x.p.type === "expense");
+                  if (!uncategorized.length)
+                    return toast.info("Nothing uncategorized");
+                  setAiBusy(true);
+                  try {
+                    const res = await fetch("/api/ai/categorize", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        descriptions: uncategorized.map((x) => x.p.description),
+                      }),
+                    });
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || "AI failed");
+                    setPreview((prev) => {
+                      const next = [...prev!];
+                      for (const a of data.assignments as { index: number; categoryId: string | null }[]) {
+                        const target = uncategorized[a.index];
+                        if (target && a.categoryId)
+                          next[target.i] = { ...next[target.i], categoryId: a.categoryId };
+                      }
+                      return next;
+                    });
+                    toast.success("AI categorization applied");
+                  } catch (e) {
+                    toast.error((e as Error).message);
+                  } finally {
+                    setAiBusy(false);
+                  }
+                }}
+                disabled={aiBusy || pending}
+                className="h-9 rounded-md border border-border px-3 text-sm hover:bg-accent disabled:opacity-50"
+              >
+                {aiBusy ? "Categorizing…" : "✨ AI categorize"}
+              </button>
+              <button
+                onClick={doImport}
+                disabled={pending || !preview.some((p) => p.include)}
+                className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-50"
+              >
+                {pending ? "Importing…" : "Import"}
+              </button>
+            </div>
           </div>
           <div className="max-h-96 space-y-1 overflow-y-auto">
             {preview.map((p, i) => (

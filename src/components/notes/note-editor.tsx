@@ -1,12 +1,22 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
+import { Loader2, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import { updateNote } from "@/actions/notes";
+
+const AI_COMMANDS = [
+  { key: "summarize", label: "Summarize" },
+  { key: "improve", label: "Improve writing" },
+  { key: "continue", label: "Continue writing" },
+  { key: "grammar", label: "Fix grammar" },
+  { key: "translate", label: "Translate…" },
+] as const;
 
 async function uploadFile(file: File): Promise<string> {
   const form = new FormData();
@@ -41,24 +51,96 @@ export function NoteEditor({
     uploadFile,
   });
 
+  const [aiBusy, setAiBusy] = useState<string | null>(null);
+
   useEffect(() => {
     return () => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
     };
   }, []);
 
+  async function runAi(command: string) {
+    const plain = editor.document
+      .map((b) =>
+        Array.isArray(b.content)
+          ? b.content
+              .map((c) => ("text" in c ? (c as { text: string }).text : ""))
+              .join("")
+          : ""
+      )
+      .join("\n")
+      .trim();
+    if (!plain) return toast.error("Note is empty");
+
+    let lang: string | null = null;
+    if (command === "translate") {
+      lang = prompt("Translate to which language?", "Malayalam");
+      if (!lang) return;
+    }
+
+    setAiBusy(command);
+    try {
+      const res = await fetch("/api/ai/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ command, text: plain, lang }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "AI failed");
+      const last = editor.document[editor.document.length - 1];
+      const label = AI_COMMANDS.find((c) => c.key === command)?.label ?? command;
+      editor.insertBlocks(
+        [
+          { type: "heading", props: { level: 3 }, content: `✨ ${label}` },
+          ...data.result
+            .split("\n")
+            .filter((line: string) => line.trim())
+            .map((line: string) => ({
+              type: "paragraph" as const,
+              content: line,
+            })),
+        ],
+        last,
+        "after"
+      );
+      updateNote(noteId, { content: JSON.stringify(editor.document) }).catch(
+        console.error
+      );
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setAiBusy(null);
+    }
+  }
+
   return (
-    <BlockNoteView
-      editor={editor}
-      theme={resolvedTheme === "dark" ? "dark" : "light"}
-      onChange={() => {
-        if (saveTimer.current) clearTimeout(saveTimer.current);
-        saveTimer.current = setTimeout(() => {
-          updateNote(noteId, {
-            content: JSON.stringify(editor.document),
-          }).catch(console.error);
-        }, 800);
-      }}
-    />
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-1">
+        <Sparkles className="h-3.5 w-3.5 text-muted-foreground" />
+        {AI_COMMANDS.map((c) => (
+          <button
+            key={c.key}
+            onClick={() => runAi(c.key)}
+            disabled={aiBusy !== null}
+            className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[11px] text-muted-foreground hover:bg-accent hover:text-foreground disabled:opacity-50"
+          >
+            {aiBusy === c.key && <Loader2 className="h-3 w-3 animate-spin" />}
+            {c.label}
+          </button>
+        ))}
+      </div>
+      <BlockNoteView
+        editor={editor}
+        theme={resolvedTheme === "dark" ? "dark" : "light"}
+        onChange={() => {
+          if (saveTimer.current) clearTimeout(saveTimer.current);
+          saveTimer.current = setTimeout(() => {
+            updateNote(noteId, {
+              content: JSON.stringify(editor.document),
+            }).catch(console.error);
+          }, 800);
+        }}
+      />
+    </div>
   );
 }

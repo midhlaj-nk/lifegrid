@@ -127,6 +127,22 @@ export const tasks = pgTable("tasks", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ---------- AI settings (keys server-side only, never sent to client) ----------
+
+export const aiSettings = pgTable("ai_settings", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  geminiApiKey: text("gemini_api_key").notNull().default(""),
+  openrouterApiKey: text("openrouter_api_key").notNull().default(""),
+  // model ids per feature tier
+  chatModel: text("chat_model").notNull().default("gemini-2.5-flash"),
+  fastModel: text("fast_model").notNull().default("gemini-2.5-flash-lite"),
+  // "gemini" | "openrouter"
+  chatProvider: text("chat_provider").notNull().default("gemini"),
+  fastProvider: text("fast_provider").notNull().default("gemini"),
+});
+
 // ---------- Finance (standalone module; amounts in integer paise) ----------
 
 export const finAccounts = pgTable("fin_accounts", {
