@@ -5,6 +5,8 @@ import { usePathname } from "next/navigation";
 import {
   Briefcase,
   CalendarDays,
+  CalendarRange,
+  PartyPopper,
   CheckCircle2,
   ChevronDown,
   FileClock,
@@ -73,6 +75,8 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
 
       <div className="space-y-0.5">
         {navLink("/notes", "Notes", undefined, FileText)}
+        {navLink("/calendar", "Calendar", undefined, CalendarRange)}
+        {navLink("/events", "Events", undefined, PartyPopper)}
       </div>
 
       <div>

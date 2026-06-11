@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
+import { Columns3 } from "lucide-react";
 import { eq, and } from "drizzle-orm";
 import { db } from "@/db";
 import { projects } from "@/db/schema";
@@ -27,12 +29,20 @@ export default async function ProjectPage({
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center gap-2">
-        <span
-          className="h-3 w-3 rounded-full"
-          style={{ backgroundColor: project.color }}
-        />
-        <h1 className="text-xl font-semibold tracking-tight">{project.name}</h1>
+      <header className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span
+            className="h-3 w-3 rounded-full"
+            style={{ backgroundColor: project.color }}
+          />
+          <h1 className="text-xl font-semibold tracking-tight">{project.name}</h1>
+        </div>
+        <Link
+          href={`/project/${id}/board`}
+          className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent"
+        >
+          <Columns3 className="h-3.5 w-3.5" /> Board
+        </Link>
       </header>
 
       <QuickAdd projectId={id} />

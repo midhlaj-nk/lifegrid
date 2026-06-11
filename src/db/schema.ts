@@ -127,6 +127,22 @@ export const tasks = pgTable("tasks", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ---------- Events / countdowns ----------
+
+export const events = pgTable("events", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  date: date("date").notNull(),
+  yearlyRecurring: boolean("yearly_recurring").notNull().default(false),
+  color: text("color").notNull().default("#f59e0b"),
+  icon: text("icon").notNull().default("🎉"),
+  note: text("note").notNull().default(""),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // ---------- Notes ----------
 
 export const notes = pgTable("notes", {
