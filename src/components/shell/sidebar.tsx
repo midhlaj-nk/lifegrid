@@ -16,6 +16,7 @@ import {
   LayoutDashboard,
   ShieldCheck,
   Target,
+  Wallet,
   Plus,
   Settings2,
   Sun,
@@ -85,6 +86,7 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
         {navLink("/habits", "Habits", undefined, Flame)}
         {navLink("/goals", "Goals", undefined, Target)}
         {navLink("/vault", "Vault", undefined, ShieldCheck)}
+        {navLink("/finance", "Finance", undefined, Wallet)}
       </div>
 
       <div>

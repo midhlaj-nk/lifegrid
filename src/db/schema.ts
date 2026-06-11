@@ -127,6 +127,129 @@ export const tasks = pgTable("tasks", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// ---------- Finance (standalone module; amounts in integer paise) ----------
+
+export const finAccounts = pgTable("fin_accounts", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  type: text("type", { enum: ["bank", "cash", "card", "upi"] })
+    .notNull()
+    .default("bank"),
+  openingBalanceMinor: integer("opening_balance_minor").notNull().default(0),
+  color: text("color").notNull().default("#6366f1"),
+  archived: boolean("archived").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const finCategories = pgTable("fin_categories", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  icon: text("icon").notNull().default("💸"),
+  kind: text("kind", { enum: ["expense", "income"] })
+    .notNull()
+    .default("expense"),
+});
+
+export const finTransactions = pgTable("fin_transactions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  accountId: text("account_id")
+    .notNull()
+    .references(() => finAccounts.id, { onDelete: "cascade" }),
+  categoryId: text("category_id").references(() => finCategories.id, {
+    onDelete: "set null",
+  }),
+  type: text("type", { enum: ["expense", "income", "transfer"] }).notNull(),
+  // INR paise (converted via manual rate when foreign)
+  amountMinor: integer("amount_minor").notNull(),
+  originalAmount: text("original_amount"), // e.g. "25.00"
+  originalCurrency: text("original_currency"), // e.g. "USD"
+  date: date("date").notNull(),
+  note: text("note").notNull().default(""),
+  transferToAccountId: text("transfer_to_account_id"),
+  subscriptionId: text("subscription_id"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const finBudgets = pgTable("fin_budgets", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  categoryId: text("category_id")
+    .notNull()
+    .references(() => finCategories.id, { onDelete: "cascade" }),
+  monthlyLimitMinor: integer("monthly_limit_minor").notNull(),
+});
+
+export const finSubscriptions = pgTable("fin_subscriptions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  amountMinor: integer("amount_minor").notNull(),
+  accountId: text("account_id")
+    .notNull()
+    .references(() => finAccounts.id, { onDelete: "cascade" }),
+  categoryId: text("category_id").references(() => finCategories.id, {
+    onDelete: "set null",
+  }),
+  cadence: text("cadence", { enum: ["weekly", "monthly", "yearly"] })
+    .notNull()
+    .default("monthly"),
+  nextDueDate: date("next_due_date").notNull(),
+  active: boolean("active").notNull().default(true),
+  autoLog: boolean("auto_log").notNull().default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const finSavingsGoals = pgTable("fin_savings_goals", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  targetMinor: integer("target_minor").notNull(),
+  savedMinor: integer("saved_minor").notNull().default(0),
+  deadline: date("deadline"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const finLent = pgTable("fin_lent", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  person: text("person").notNull(),
+  direction: text("direction", { enum: ["lent", "borrowed"] }).notNull(),
+  amountMinor: integer("amount_minor").notNull(),
+  date: date("date").notNull(),
+  note: text("note").notNull().default(""),
+  settled: boolean("settled").notNull().default(false),
+  settledAt: timestamp("settled_at"),
+});
+
+export const finRules = pgTable("fin_rules", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  // case-insensitive substring matched against CSV description / note
+  pattern: text("pattern").notNull(),
+  categoryId: text("category_id")
+    .notNull()
+    .references(() => finCategories.id, { onDelete: "cascade" }),
+});
+
 // ---------- Vault (ciphertext only — server never sees plaintext) ----------
 
 export const vaultMeta = pgTable("vault_meta", {
