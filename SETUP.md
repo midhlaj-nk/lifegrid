@@ -1,6 +1,17 @@
 # Life OS — Setup & Deploy Guide
 
-All 8 phases are built and committed. Full requirements: `../REQUIREMENTS.md`.
+All 8 phases + second-night additions are built and committed. Full
+requirements: `../REQUIREMENTS.md`.
+
+Second-night additions: bug/UX batch (task editing, optimistic toggles,
+touch actions, dialogs, custom kanban stages, vault password change +
+encrypted backup + search, week calendar, habit heatmaps, sessions
+management, service worker, 18 unit tests), collapsible sidebar sections,
+dashboard v2 (weather chip, AI news, drag-drop widgets), accent themes +
+Notion-style covers + notes gallery, spreadsheets (/sheets, Univer),
+canvas notes with pen support (Excalidraw, per-note Page/Canvas toggle),
+apps launcher (/apps, Odoo-style), Playwright sweep script
+(`node scripts/e2e-sweep.mjs` against :3100 with BETTER_AUTH_URL set).
 
 ## Run locally (works right now)
 
