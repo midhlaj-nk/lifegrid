@@ -8,6 +8,8 @@ import { requireUser } from "@/lib/session";
 import { NoteEditor } from "@/components/notes/note-editor";
 import { NoteHeader, LinkedTasks, MoveNoteButton } from "./note-client";
 import { NoteCover } from "@/components/cover-clients";
+import { NoteCanvas } from "@/components/notes/note-canvas";
+import { ModeToggle } from "./note-client";
 
 export default async function NotePage({
   params,
@@ -82,7 +84,8 @@ export default async function NotePage({
             </Link>
           </span>
         ))}
-        <span className="ml-auto">
+        <span className="ml-auto flex items-center gap-3">
+          <ModeToggle noteId={note.id} mode={note.mode} />
           <MoveNoteButton noteId={note.id} allNotes={allNotes} />
         </span>
       </nav>
@@ -95,7 +98,11 @@ export default async function NotePage({
         allTasks={openTasks.filter((t) => t.status !== "done")}
       />
 
-      <NoteEditor noteId={note.id} initialContent={note.content} />
+      {note.mode === "canvas" ? (
+        <NoteCanvas noteId={note.id} initialCanvas={note.canvas} />
+      ) : (
+        <NoteEditor noteId={note.id} initialContent={note.content} />
+      )}
 
       {children.length > 0 && (
         <section className="border-t border-border pt-4">

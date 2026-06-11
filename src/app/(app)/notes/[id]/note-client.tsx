@@ -2,10 +2,49 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { FolderInput, Link2, X } from "lucide-react";
+import { FolderInput, Link2, PenTool, FileText, X } from "lucide-react";
 import { updateNote, linkNoteToTask, unlinkNoteFromTask } from "@/actions/notes";
 import { AppModal } from "@/components/ui/app-dialog";
 import { cn } from "@/lib/utils";
+
+export function ModeToggle({
+  noteId,
+  mode,
+}: {
+  noteId: string;
+  mode: "page" | "canvas";
+}) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+
+  return (
+    <div className={cn("flex rounded-md border border-border p-0.5", pending && "opacity-50")}>
+      {(
+        [
+          { key: "page", label: "Page", icon: FileText },
+          { key: "canvas", label: "Canvas", icon: PenTool },
+        ] as const
+      ).map((m) => (
+        <button
+          key={m.key}
+          onClick={() =>
+            startTransition(async () => {
+              await updateNote(noteId, { mode: m.key });
+              router.refresh();
+            })
+          }
+          className={cn(
+            "inline-flex items-center gap-1 rounded px-2 py-0.5 text-[11px]",
+            mode === m.key ? "bg-accent font-medium" : "text-muted-foreground"
+          )}
+        >
+          <m.icon className="h-3 w-3" />
+          {m.label}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export function MoveNoteButton({
   noteId,

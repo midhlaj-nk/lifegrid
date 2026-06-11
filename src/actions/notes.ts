@@ -25,7 +25,15 @@ export async function createNote(input: {
 
 export async function updateNote(
   id: string,
-  input: { title?: string; icon?: string; content?: string; parentId?: string | null; cover?: string }
+  input: {
+    title?: string;
+    icon?: string;
+    content?: string;
+    parentId?: string | null;
+    cover?: string;
+    canvas?: string;
+    mode?: "page" | "canvas";
+  }
 ) {
   const user = await requireUser();
   await db
@@ -37,7 +45,8 @@ export async function updateNote(
     input.title !== undefined ||
     input.icon !== undefined ||
     input.parentId !== undefined ||
-    input.cover !== undefined
+    input.cover !== undefined ||
+    input.mode !== undefined
   ) {
     revalidatePath("/notes", "layout");
   }

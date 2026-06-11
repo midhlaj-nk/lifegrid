@@ -408,6 +408,11 @@ export const notes = pgTable("notes", {
   cover: text("cover").notNull().default(""),
   // BlockNote document JSON
   content: text("content").notNull().default("[]"),
+  // Excalidraw scene JSON for canvas mode
+  canvas: text("canvas").notNull().default(""),
+  mode: text("mode", { enum: ["page", "canvas"] })
+    .notNull()
+    .default("page"),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
