@@ -1,6 +1,6 @@
 "use client";
 
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/theme-provider";
 import { Check, Monitor, Moon, Sun } from "lucide-react";
 import { ACCENTS, useAccent } from "@/components/accent-provider";
 import { cn } from "@/lib/utils";

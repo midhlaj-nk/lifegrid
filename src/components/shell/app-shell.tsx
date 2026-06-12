@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutGrid, Moon, PanelLeft, Settings, Sun, X } from "lucide-react";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/theme-provider";
 import { Sidebar } from "./sidebar";
 import { MobileBottomNav } from "./mobile-nav";
 import { cn } from "@/lib/utils";

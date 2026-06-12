@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { ThemeProvider } from "@/components/theme-provider";
+import { ThemeProvider, THEME_INIT_SCRIPT } from "@/components/theme-provider";
 import { AccentProvider } from "@/components/accent-provider";
 import { ConfirmProvider } from "@/components/ui/app-dialog";
 import { SwRegister } from "@/components/sw-register";
@@ -41,10 +41,16 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        {/* no-flash theme init — static server HTML, runs before paint;
+            placed in <head> so it never trips React's "script in a client
+            component" warning the way next-themes did */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       {/* suppressHydrationWarning: browser extensions (e.g. Odoo Toolbox)
           inject data-* attributes on <body> before React hydrates */}
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider>
           <AccentProvider>
             <ConfirmProvider>
               {children}

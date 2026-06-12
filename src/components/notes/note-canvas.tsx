@@ -2,7 +2,7 @@
 
 import { useCallback, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/theme-provider";
 import { toast } from "sonner";
 import "tldraw/tldraw.css";
 import { updateNote } from "@/actions/notes";

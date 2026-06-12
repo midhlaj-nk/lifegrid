@@ -5,7 +5,7 @@ import { ChevronRight } from "lucide-react";
 import { db } from "@/db";
 import { notes, noteTaskLinks, tasks } from "@/db/schema";
 import { requireUser } from "@/lib/session";
-import { NoteEditor } from "@/components/notes/note-editor";
+import { NoteEditorShell } from "@/components/notes/note-editor-shell";
 import { NoteHeader, LinkedTasks, MoveNoteButton } from "./note-client";
 import { NoteCover } from "@/components/cover-clients";
 import { NoteCanvas } from "@/components/notes/note-canvas";
@@ -101,7 +101,7 @@ export default async function NotePage({
       {note.mode === "canvas" ? (
         <NoteCanvas noteId={note.id} initialCanvas={note.canvas} />
       ) : (
-        <NoteEditor noteId={note.id} initialContent={note.content} />
+        <NoteEditorShell noteId={note.id} initialContent={note.content} />
       )}
 
       {children.length > 0 && (
