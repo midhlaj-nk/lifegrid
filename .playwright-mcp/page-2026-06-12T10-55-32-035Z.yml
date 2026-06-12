@@ -1,0 +1,292 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: Life OS
+        - generic [ref=e6]:
+          - button "Toggle theme" [ref=e7]:
+            - img [ref=e8]
+          - link "Settings" [ref=e14] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e15]
+      - navigation [ref=e18]:
+        - generic [ref=e89]:
+          - button "Tasks" [ref=e317]:
+            - img [ref=e318]
+            - text: Tasks
+          - generic [ref=e94]:
+            - link "Home" [ref=e95] [cursor=pointer]:
+              - /url: /
+              - img [ref=e96]
+              - generic [ref=e101]: Home
+            - link "Today" [ref=e102] [cursor=pointer]:
+              - /url: /today
+              - img [ref=e103]
+              - generic [ref=e109]: Today
+            - link "Upcoming" [ref=e110] [cursor=pointer]:
+              - /url: /upcoming
+              - img [ref=e111]
+              - generic [ref=e113]: Upcoming
+            - link "Inbox" [ref=e114] [cursor=pointer]:
+              - /url: /inbox
+              - img [ref=e115]
+              - generic [ref=e118]: Inbox
+            - link "Completed" [ref=e119] [cursor=pointer]:
+              - /url: /completed
+              - img [ref=e120]
+              - generic [ref=e123]: Completed
+        - generic [ref=e124]:
+          - button "Pages" [ref=e321]:
+            - img [ref=e322]
+            - text: Pages
+          - generic [ref=e129]:
+            - link "Notes" [ref=e130] [cursor=pointer]:
+              - /url: /notes
+              - img [ref=e131]
+              - generic [ref=e134]: Notes
+            - link "Sheets" [ref=e135] [cursor=pointer]:
+              - /url: /sheets
+              - img [ref=e136]
+              - generic [ref=e139]: Sheets
+        - generic [ref=e140]:
+          - button "Planning" [ref=e325]:
+            - img [ref=e326]
+            - text: Planning
+          - generic [ref=e145]:
+            - link "Calendar" [ref=e146] [cursor=pointer]:
+              - /url: /calendar
+              - img [ref=e147]
+              - generic [ref=e149]: Calendar
+            - link "Events" [ref=e150] [cursor=pointer]:
+              - /url: /events
+              - img [ref=e151]
+              - generic [ref=e157]: Events
+            - link "Habits" [ref=e158] [cursor=pointer]:
+              - /url: /habits
+              - img [ref=e159]
+              - generic [ref=e161]: Habits
+            - link "Goals" [ref=e162] [cursor=pointer]:
+              - /url: /goals
+              - img [ref=e163]
+              - generic [ref=e167]: Goals
+        - generic [ref=e168]:
+          - button "Tools" [ref=e329]:
+            - img [ref=e330]
+            - text: Tools
+          - generic [ref=e173]:
+            - link "Finance" [ref=e174] [cursor=pointer]:
+              - /url: /finance
+              - img [ref=e175]
+              - generic [ref=e178]: Finance
+            - link "Vault" [ref=e179] [cursor=pointer]:
+              - /url: /vault
+              - img [ref=e180]
+              - generic [ref=e183]: Vault
+            - link "Assistant" [ref=e184] [cursor=pointer]:
+              - /url: /assistant
+              - img [ref=e185]
+              - generic [ref=e188]: Assistant
+            - link "Insights" [ref=e189] [cursor=pointer]:
+              - /url: /insights
+              - img [ref=e190]
+              - generic [ref=e193]: Insights
+        - generic [ref=e194]:
+          - button "Worklog" [ref=e333]:
+            - img [ref=e334]
+            - text: Worklog
+          - generic [ref=e199]:
+            - link "Daily report" [ref=e200] [cursor=pointer]:
+              - /url: /worklog
+              - img [ref=e201]
+              - generic [ref=e204]: Daily report
+            - link "Weekly report" [ref=e205] [cursor=pointer]:
+              - /url: /worklog/weekly
+              - img [ref=e206]
+              - generic [ref=e208]: Weekly report
+            - link "History" [ref=e209] [cursor=pointer]:
+              - /url: /worklog/history
+              - img [ref=e210]
+              - generic [ref=e215]: History
+            - link "Worklog settings" [ref=e216] [cursor=pointer]:
+              - /url: /worklog/settings
+              - img [ref=e217]
+              - generic [ref=e220]: Worklog settings
+        - generic [ref=e221]:
+          - generic [ref=e336]:
+            - button "Areas" [ref=e337]:
+              - img [ref=e338]
+              - text: Areas
+            - button "New area" [ref=e341]:
+              - img [ref=e342]
+          - generic [ref=e231]:
+            - button "Toggle area" [ref=e232]:
+              - img [ref=e233]
+            - link "work" [ref=e236] [cursor=pointer]:
+              - /url: /area/593e06eb-af3c-4ef8-b080-06b4af7d5816
+              - generic [ref=e238]: work
+        - generic [ref=e239]:
+          - generic [ref=e343]:
+            - button "Projects" [ref=e344]:
+              - img [ref=e345]
+              - text: Projects
+            - button "New project" [ref=e348]:
+              - img [ref=e349]
+          - generic [ref=e247]:
+            - link "Assista" [ref=e250] [cursor=pointer]:
+              - /url: /project/53ff3183-8806-4c03-841a-2f9746c1b4d1
+              - generic [ref=e252]: Assista
+            - link "E2E Project" [ref=e255] [cursor=pointer]:
+              - /url: /project/e220ab68-9e52-4840-8468-940f6314cb71
+              - generic [ref=e257]: E2E Project
+        - generic [ref=e258]:
+          - button "Tags" [ref=e351]:
+            - img [ref=e352]
+            - text: Tags
+          - link "e2e" [ref=e264] [cursor=pointer]:
+            - /url: /tag/83af6e80-e0df-41ce-a565-1a578141dec4
+            - img [ref=e265]
+            - text: e2e
+    - generic [ref=e19]:
+      - banner [ref=e20]:
+        - button "Toggle sidebar" [ref=e21]:
+          - img [ref=e22]
+        - link "All apps" [ref=e24] [cursor=pointer]:
+          - /url: /apps
+          - img [ref=e25]
+        - generic [ref=e30]: Irfan
+      - main [ref=e31]:
+        - generic [ref=e268]:
+          - generic [ref=e274]:
+            - button "Change icon" [ref=e276]: 🛠️
+            - textbox "Untitled" [ref=e277]
+          - navigation [ref=e278]:
+            - link "Notes" [ref=e279] [cursor=pointer]:
+              - /url: /notes
+            - generic [ref=e280]:
+              - generic [ref=e281]:
+                - button "Page" [ref=e282]:
+                  - img [ref=e283]
+                  - text: Page
+                - button "Canvas" [active] [ref=e286]:
+                  - img [ref=e287]
+                  - text: Canvas
+              - button "Move" [ref=e292]:
+                - img [ref=e293]
+                - text: Move
+          - button "Link task" [ref=e297]:
+            - img [ref=e298]
+            - text: Link task
+          - generic [ref=e354]:
+            - generic [ref=e355]:
+              - link "Back to notes" [ref=e356] [cursor=pointer]:
+                - /url: /notes
+                - img [ref=e357]
+              - generic [ref=e359]: Untitled
+              - generic [ref=e360]:
+                - button "Page" [ref=e361]:
+                  - img [ref=e362]
+                  - text: Page
+                - button "Canvas" [disabled] [ref=e365]:
+                  - img [ref=e366]
+                  - text: Canvas
+              - generic [ref=e371]:
+                - img [ref=e372]
+                - text: Saving
+            - generic [ref=e375]:
+              - generic:
+                - generic:
+                  - generic:
+                    - button [ref=e378] [cursor=pointer]:
+                      - img [ref=e379]
+                    - region "Shapes":
+                      - generic [ref=e385]:
+                        - generic:
+                          - generic: To move canvas, hold mouse wheel or spacebar while dragging, or use the hand tool
+                        - heading "Shapes" [level=2] [ref=e386]
+                        - generic [ref=e387]:
+                          - generic "Keep selected tool active after drawing — Q" [ref=e388] [cursor=pointer]:
+                            - checkbox "Keep selected tool active after drawing"
+                            - img [ref=e390]
+                          - generic "Hand (panning tool) — H" [ref=e397] [cursor=pointer]:
+                            - radio "Hand (panning tool) — H"
+                            - img [ref=e399]
+                          - generic "Selection — V or 1" [ref=e406] [cursor=pointer]:
+                            - radio "Selection" [checked]
+                            - generic [ref=e407]:
+                              - img [ref=e408]
+                              - generic [ref=e413]: "1"
+                          - generic "Rectangle — R or 2" [ref=e414] [cursor=pointer]:
+                            - radio "Rectangle"
+                            - generic [ref=e415]:
+                              - img [ref=e416]
+                              - generic [ref=e420]: "2"
+                          - generic "Diamond — D or 3" [ref=e421] [cursor=pointer]:
+                            - radio "Diamond"
+                            - generic [ref=e422]:
+                              - img [ref=e423]
+                              - generic [ref=e427]: "3"
+                          - generic "Ellipse — O or 4" [ref=e428] [cursor=pointer]:
+                            - radio "Ellipse"
+                            - generic [ref=e429]:
+                              - img [ref=e430]
+                              - generic [ref=e434]: "4"
+                          - generic "Arrow — A or 5" [ref=e435] [cursor=pointer]:
+                            - radio "Arrow"
+                            - generic [ref=e436]:
+                              - img [ref=e437]
+                              - generic [ref=e442]: "5"
+                          - generic "Line — L or 6" [ref=e443] [cursor=pointer]:
+                            - radio "Line"
+                            - generic [ref=e444]:
+                              - img [ref=e445]
+                              - generic [ref=e446]: "6"
+                          - generic "Draw — P or 7" [ref=e447] [cursor=pointer]:
+                            - radio "Draw"
+                            - generic [ref=e448]:
+                              - img [ref=e449]
+                              - generic [ref=e453]: "7"
+                          - generic "Text — T or 8" [ref=e454] [cursor=pointer]:
+                            - radio "Text"
+                            - generic [ref=e455]:
+                              - img [ref=e456]
+                              - generic [ref=e461]: "8"
+                          - generic "Insert image — 9" [ref=e462] [cursor=pointer]:
+                            - radio "Insert image"
+                            - generic [ref=e463]:
+                              - img [ref=e464]
+                              - generic [ref=e469]: "9"
+                          - generic "Eraser — E or 0" [ref=e470] [cursor=pointer]:
+                            - radio "Eraser"
+                            - generic [ref=e471]:
+                              - img [ref=e472]
+                              - generic [ref=e477]: "0"
+                          - button "More tools" [ref=e479] [cursor=pointer]:
+                            - img [ref=e480]
+                    - generic "Library" [ref=e486]:
+                      - checkbox "Library"
+                      - generic [ref=e487] [cursor=pointer]:
+                        - img [ref=e489]
+                        - generic: Library
+                - contentinfo:
+                  - region "Canvas actions" [ref=e495]:
+                    - heading "Canvas actions" [level=2] [ref=e496]
+                    - generic [ref=e498]:
+                      - button "Zoom out" [ref=e499] [cursor=pointer]:
+                        - img [ref=e501]
+                      - button "Reset zoom" [ref=e503] [cursor=pointer]: 100%
+                      - button "Zoom in" [ref=e504] [cursor=pointer]:
+                        - img [ref=e506]
+                    - generic [ref=e508]:
+                      - button "Undo" [disabled] [ref=e511]:
+                        - img [ref=e513]
+                      - button "Redo" [disabled] [ref=e517]:
+                        - img [ref=e519]
+                  - button "Help" [ref=e522] [cursor=pointer]:
+                    - img [ref=e523]
+              - generic:
+                - img
+              - generic [ref=e528]: Drawing canvas
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e85] [cursor=pointer]:
+    - img [ref=e86]
+  - alert [ref=e315]

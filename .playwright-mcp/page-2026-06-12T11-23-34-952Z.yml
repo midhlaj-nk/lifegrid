@@ -1,0 +1,200 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: Life OS
+        - generic [ref=e6]:
+          - button "Toggle theme" [ref=e7]:
+            - img [ref=e8]
+          - link "Settings" [ref=e10] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e11]
+      - navigation [ref=e14]:
+        - generic [ref=e133]:
+          - button "Tasks" [ref=e337]:
+            - img [ref=e338]
+            - text: Tasks
+          - generic [ref=e140]:
+            - link "Home" [ref=e141] [cursor=pointer]:
+              - /url: /
+              - img [ref=e142]
+              - generic [ref=e147]: Home
+            - link "Today" [ref=e148] [cursor=pointer]:
+              - /url: /today
+              - img [ref=e149]
+              - generic [ref=e155]: Today
+            - link "Upcoming" [ref=e156] [cursor=pointer]:
+              - /url: /upcoming
+              - img [ref=e157]
+              - generic [ref=e159]: Upcoming
+            - link "Inbox" [ref=e160] [cursor=pointer]:
+              - /url: /inbox
+              - img [ref=e161]
+              - generic [ref=e164]: Inbox
+            - link "Completed" [ref=e165] [cursor=pointer]:
+              - /url: /completed
+              - img [ref=e166]
+              - generic [ref=e169]: Completed
+        - generic [ref=e170]:
+          - button "Pages" [ref=e341]:
+            - img [ref=e342]
+            - text: Pages
+          - generic [ref=e177]:
+            - link "Notes" [active] [ref=e178] [cursor=pointer]:
+              - /url: /notes
+              - img [ref=e179]
+              - generic [ref=e182]: Notes
+            - link "Sheets" [ref=e183] [cursor=pointer]:
+              - /url: /sheets
+              - img [ref=e184]
+              - generic [ref=e187]: Sheets
+        - generic [ref=e188]:
+          - button "Planning" [ref=e345]:
+            - img [ref=e346]
+            - text: Planning
+          - generic [ref=e195]:
+            - link "Calendar" [ref=e196] [cursor=pointer]:
+              - /url: /calendar
+              - img [ref=e197]
+              - generic [ref=e199]: Calendar
+            - link "Events" [ref=e200] [cursor=pointer]:
+              - /url: /events
+              - img [ref=e201]
+              - generic [ref=e207]: Events
+            - link "Habits" [ref=e208] [cursor=pointer]:
+              - /url: /habits
+              - img [ref=e209]
+              - generic [ref=e211]: Habits
+            - link "Goals" [ref=e212] [cursor=pointer]:
+              - /url: /goals
+              - img [ref=e213]
+              - generic [ref=e217]: Goals
+        - generic [ref=e218]:
+          - button "Tools" [ref=e349]:
+            - img [ref=e350]
+            - text: Tools
+          - generic [ref=e225]:
+            - link "Finance" [ref=e226] [cursor=pointer]:
+              - /url: /finance
+              - img [ref=e227]
+              - generic [ref=e230]: Finance
+            - link "Vault" [ref=e231] [cursor=pointer]:
+              - /url: /vault
+              - img [ref=e232]
+              - generic [ref=e235]: Vault
+            - link "Assistant" [ref=e236] [cursor=pointer]:
+              - /url: /assistant
+              - img [ref=e237]
+              - generic [ref=e240]: Assistant
+            - link "Insights" [ref=e241] [cursor=pointer]:
+              - /url: /insights
+              - img [ref=e242]
+              - generic [ref=e245]: Insights
+        - generic [ref=e246]:
+          - button "Worklog" [ref=e353]:
+            - img [ref=e354]
+            - text: Worklog
+          - generic [ref=e253]:
+            - link "Daily report" [ref=e254] [cursor=pointer]:
+              - /url: /worklog
+              - img [ref=e255]
+              - generic [ref=e258]: Daily report
+            - link "Weekly report" [ref=e259] [cursor=pointer]:
+              - /url: /worklog/weekly
+              - img [ref=e260]
+              - generic [ref=e262]: Weekly report
+            - link "History" [ref=e263] [cursor=pointer]:
+              - /url: /worklog/history
+              - img [ref=e264]
+              - generic [ref=e269]: History
+            - link "Worklog settings" [ref=e270] [cursor=pointer]:
+              - /url: /worklog/settings
+              - img [ref=e271]
+              - generic [ref=e274]: Worklog settings
+        - generic [ref=e275]:
+          - generic [ref=e356]:
+            - button "Areas" [ref=e357]:
+              - img [ref=e358]
+              - text: Areas
+            - button "New area" [ref=e361]:
+              - img [ref=e362]
+          - generic [ref=e287]:
+            - button "Toggle area" [ref=e288]:
+              - img [ref=e289]
+            - link "work" [ref=e292] [cursor=pointer]:
+              - /url: /area/593e06eb-af3c-4ef8-b080-06b4af7d5816
+              - generic [ref=e294]: work
+        - generic [ref=e295]:
+          - generic [ref=e363]:
+            - button "Projects" [ref=e364]:
+              - img [ref=e365]
+              - text: Projects
+            - button "New project" [ref=e368]:
+              - img [ref=e369]
+          - generic [ref=e305]:
+            - link "Assista" [ref=e308] [cursor=pointer]:
+              - /url: /project/53ff3183-8806-4c03-841a-2f9746c1b4d1
+              - generic [ref=e310]: Assista
+            - link "E2E Project" [ref=e313] [cursor=pointer]:
+              - /url: /project/e220ab68-9e52-4840-8468-940f6314cb71
+              - generic [ref=e315]: E2E Project
+        - generic [ref=e316]:
+          - button "Tags" [ref=e371]:
+            - img [ref=e372]
+            - text: Tags
+          - link "e2e" [ref=e325] [cursor=pointer]:
+            - /url: /tag/83af6e80-e0df-41ce-a565-1a578141dec4
+            - img [ref=e326]
+            - text: e2e
+    - generic [ref=e15]:
+      - banner [ref=e16]:
+        - button "Toggle sidebar" [ref=e17]:
+          - img [ref=e18]
+        - link "All apps" [ref=e20] [cursor=pointer]:
+          - /url: /apps
+          - img [ref=e21]
+        - generic [ref=e26]: Irfan
+      - main [ref=e27]:
+        - generic [ref=e374]:
+          - generic [ref=e375]:
+            - heading "Notes" [level=1] [ref=e376]
+            - generic [ref=e377]:
+              - button "gallery view" [ref=e378]:
+                - img [ref=e379]
+              - button "tree view" [ref=e384]:
+                - img [ref=e385]
+          - generic [ref=e388]:
+            - button "New page" [ref=e389]:
+              - img [ref=e390]
+              - text: New page
+            - generic [ref=e391]:
+              - img [ref=e392]
+              - textbox "Search pages…" [ref=e395]
+          - generic [ref=e396]:
+            - link "Untitled 16 minutes ago" [ref=e397] [cursor=pointer]:
+              - /url: /notes/c5261570-9199-47a4-9ca9-a1a0922a4272
+              - generic [ref=e399]:
+                - paragraph [ref=e400]: Untitled
+                - paragraph [ref=e401]: 16 minutes ago
+            - link "📄 Untitled about 2 hours ago" [ref=e402] [cursor=pointer]:
+              - /url: /notes/29d40e2e-895a-481d-b4ce-865ec90a1ab8
+              - generic [ref=e404]: 📄
+              - generic [ref=e405]:
+                - paragraph [ref=e406]: Untitled
+                - paragraph [ref=e407]: about 2 hours ago
+            - link "📄 Untitled about 5 hours ago · 1 subpage" [ref=e408] [cursor=pointer]:
+              - /url: /notes/3d75c266-f369-4bba-9c46-ee826f4b8761
+              - generic [ref=e410]: 📄
+              - generic [ref=e411]:
+                - paragraph [ref=e412]: Untitled
+                - paragraph [ref=e413]: about 5 hours ago · 1 subpage
+            - link "📄 E2E meeting notes about 5 hours ago" [ref=e414] [cursor=pointer]:
+              - /url: /notes/99aaa9d6-8e09-4e95-8388-a1002cf05773
+              - generic [ref=e416]: 📄
+              - generic [ref=e417]:
+                - paragraph [ref=e418]: E2E meeting notes
+                - paragraph [ref=e419]: about 5 hours ago
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e129] [cursor=pointer]:
+    - img [ref=e130]
+  - alert [ref=e335]

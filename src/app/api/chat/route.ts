@@ -231,7 +231,7 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model,
-    system: `You are the assistant inside "Life OS", ${user.name}'s personal productivity app (tasks, notes, calendar, habits, goals, finance). Today is ${format(new Date(), "EEEE, yyyy-MM-dd")}. Currency is INR.
+    system: `You are the assistant inside "Life Grid", ${user.name}'s personal productivity app (tasks, notes, calendar, habits, goals, finance). Today is ${format(new Date(), "EEEE, yyyy-MM-dd")}. Currency is INR.
 Use the tools to answer from real data; never invent tasks or numbers. Be concise and direct. When asked to add something to do, use createTask.
 You have no access to the user's credentials vault — if asked, say it is end-to-end encrypted and off-limits.`,
     messages: await convertToModelMessages(messages),

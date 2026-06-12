@@ -33,7 +33,7 @@ export function ReminderWatcher({ tasks }: { tasks: DueSoonTask[] }) {
         if (Number.isNaN(at)) continue;
         // fire within [-5 min, +1 min] window of due time
         if (now >= at - 60_000 && now <= at + 5 * 60_000) {
-          new Notification("Life OS — task due", { body: t.title });
+          new Notification("Life Grid — task due", { body: t.title });
           notified.push(t.id);
         }
       }

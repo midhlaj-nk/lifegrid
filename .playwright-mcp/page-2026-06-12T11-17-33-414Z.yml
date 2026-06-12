@@ -1,0 +1,230 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: Life OS
+        - generic [ref=e6]:
+          - button "Toggle theme" [ref=e7]:
+            - img [ref=e8]
+          - link "Settings" [ref=e10] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e11]
+      - navigation [ref=e14]:
+        - generic [ref=e92]:
+          - button "Tasks" [ref=e94]:
+            - img [ref=e95]
+            - text: Tasks
+          - generic [ref=e97]:
+            - link "Home" [ref=e98] [cursor=pointer]:
+              - /url: /
+              - img [ref=e99]
+              - generic [ref=e104]: Home
+            - link "Today" [ref=e105] [cursor=pointer]:
+              - /url: /today
+              - img [ref=e106]
+              - generic [ref=e112]: Today
+            - link "Upcoming" [ref=e113] [cursor=pointer]:
+              - /url: /upcoming
+              - img [ref=e114]
+              - generic [ref=e116]: Upcoming
+            - link "Inbox" [ref=e117] [cursor=pointer]:
+              - /url: /inbox
+              - img [ref=e118]
+              - generic [ref=e121]: Inbox
+            - link "Completed" [ref=e122] [cursor=pointer]:
+              - /url: /completed
+              - img [ref=e123]
+              - generic [ref=e126]: Completed
+        - generic [ref=e127]:
+          - button "Pages" [ref=e129]:
+            - img [ref=e130]
+            - text: Pages
+          - generic [ref=e132]:
+            - link "Notes" [ref=e133] [cursor=pointer]:
+              - /url: /notes
+              - img [ref=e134]
+              - generic [ref=e137]: Notes
+            - link "Sheets" [ref=e138] [cursor=pointer]:
+              - /url: /sheets
+              - img [ref=e139]
+              - generic [ref=e142]: Sheets
+        - generic [ref=e143]:
+          - button "Planning" [ref=e145]:
+            - img [ref=e146]
+            - text: Planning
+          - generic [ref=e148]:
+            - link "Calendar" [ref=e149] [cursor=pointer]:
+              - /url: /calendar
+              - img [ref=e150]
+              - generic [ref=e152]: Calendar
+            - link "Events" [ref=e153] [cursor=pointer]:
+              - /url: /events
+              - img [ref=e154]
+              - generic [ref=e160]: Events
+            - link "Habits" [ref=e161] [cursor=pointer]:
+              - /url: /habits
+              - img [ref=e162]
+              - generic [ref=e164]: Habits
+            - link "Goals" [ref=e165] [cursor=pointer]:
+              - /url: /goals
+              - img [ref=e166]
+              - generic [ref=e170]: Goals
+        - generic [ref=e171]:
+          - button "Tools" [ref=e173]:
+            - img [ref=e174]
+            - text: Tools
+          - generic [ref=e176]:
+            - link "Finance" [ref=e177] [cursor=pointer]:
+              - /url: /finance
+              - img [ref=e178]
+              - generic [ref=e181]: Finance
+            - link "Vault" [ref=e182] [cursor=pointer]:
+              - /url: /vault
+              - img [ref=e183]
+              - generic [ref=e186]: Vault
+            - link "Assistant" [ref=e187] [cursor=pointer]:
+              - /url: /assistant
+              - img [ref=e188]
+              - generic [ref=e191]: Assistant
+            - link "Insights" [ref=e192] [cursor=pointer]:
+              - /url: /insights
+              - img [ref=e193]
+              - generic [ref=e196]: Insights
+        - generic [ref=e197]:
+          - button "Worklog" [ref=e199]:
+            - img [ref=e200]
+            - text: Worklog
+          - generic [ref=e202]:
+            - link "Daily report" [ref=e203] [cursor=pointer]:
+              - /url: /worklog
+              - img [ref=e204]
+              - generic [ref=e207]: Daily report
+            - link "Weekly report" [ref=e208] [cursor=pointer]:
+              - /url: /worklog/weekly
+              - img [ref=e209]
+              - generic [ref=e211]: Weekly report
+            - link "History" [ref=e212] [cursor=pointer]:
+              - /url: /worklog/history
+              - img [ref=e213]
+              - generic [ref=e218]: History
+            - link "Worklog settings" [ref=e219] [cursor=pointer]:
+              - /url: /worklog/settings
+              - img [ref=e220]
+              - generic [ref=e223]: Worklog settings
+        - generic [ref=e224]:
+          - generic [ref=e225]:
+            - button "Areas" [ref=e226]:
+              - img [ref=e227]
+              - text: Areas
+            - button "New area" [ref=e230]:
+              - img [ref=e231]
+          - generic [ref=e234]:
+            - button "Toggle area" [ref=e235]:
+              - img [ref=e236]
+            - link "work" [ref=e239] [cursor=pointer]:
+              - /url: /area/593e06eb-af3c-4ef8-b080-06b4af7d5816
+              - generic [ref=e241]: work
+        - generic [ref=e242]:
+          - generic [ref=e243]:
+            - button "Projects" [ref=e244]:
+              - img [ref=e245]
+              - text: Projects
+            - button "New project" [ref=e248]:
+              - img [ref=e249]
+          - generic [ref=e250]:
+            - link "Assista" [ref=e253] [cursor=pointer]:
+              - /url: /project/53ff3183-8806-4c03-841a-2f9746c1b4d1
+              - generic [ref=e255]: Assista
+            - link "E2E Project" [ref=e258] [cursor=pointer]:
+              - /url: /project/e220ab68-9e52-4840-8468-940f6314cb71
+              - generic [ref=e260]: E2E Project
+        - generic [ref=e261]:
+          - button "Tags" [ref=e263]:
+            - img [ref=e264]
+            - text: Tags
+          - link "e2e" [ref=e267] [cursor=pointer]:
+            - /url: /tag/83af6e80-e0df-41ce-a565-1a578141dec4
+            - img [ref=e268]
+            - text: e2e
+    - generic [ref=e15]:
+      - banner [ref=e16]:
+        - button "Toggle sidebar" [ref=e17]:
+          - img [ref=e18]
+        - link "All apps" [ref=e20] [cursor=pointer]:
+          - /url: /apps
+          - img [ref=e21]
+        - generic [ref=e26]: Irfan
+      - main [ref=e27]:
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - heading "Settings" [level=1] [ref=e31]
+            - paragraph [ref=e32]: Manage your account and preferences
+          - generic [ref=e33]:
+            - navigation [ref=e34]:
+              - list [ref=e35]:
+                - listitem [ref=e36]:
+                  - button "Account" [ref=e37]:
+                    - img [ref=e38]
+                    - text: Account
+                - listitem [ref=e41]:
+                  - button "Appearance" [active] [ref=e42]:
+                    - img [ref=e43]
+                    - text: Appearance
+                - listitem [ref=e47]:
+                  - button "AI" [ref=e48]:
+                    - img [ref=e49]
+                    - text: AI
+            - generic [ref=e485]:
+              - heading "Appearance" [level=2] [ref=e486]
+              - paragraph [ref=e487]: Customize how Life OS looks for you.
+              - generic [ref=e489]:
+                - generic [ref=e490]:
+                  - paragraph [ref=e491]: Mode
+                  - generic [ref=e492]:
+                    - button "Light" [ref=e493]:
+                      - img [ref=e494]
+                      - generic [ref=e500]: Light
+                    - button "Dark" [ref=e501]:
+                      - img [ref=e502]
+                      - generic [ref=e504]: Dark
+                    - button "System" [ref=e505]:
+                      - img [ref=e506]
+                      - generic [ref=e508]: System
+                - generic [ref=e509]:
+                  - paragraph [ref=e510]: Color theme
+                  - generic [ref=e511]:
+                    - button "Default" [ref=e512]:
+                      - generic [ref=e519]: Default
+                    - button "Warm" [ref=e520]:
+                      - generic [ref=e527]: Warm
+                    - button "Lavender" [ref=e528]:
+                      - generic [ref=e535]: Lavender
+                    - button "Mint" [ref=e536]:
+                      - generic [ref=e543]: Mint
+                    - button "Slate" [ref=e544]:
+                      - img [ref=e552]
+                      - generic [ref=e554]: Slate
+                    - button "Sepia" [ref=e555]:
+                      - generic [ref=e562]: Sepia
+                - generic [ref=e563]:
+                  - paragraph [ref=e564]: Accent color
+                  - generic [ref=e565]:
+                    - button "Neutral" [ref=e566]:
+                      - img [ref=e568]
+                      - generic [ref=e570]: Neutral
+                    - button "Indigo" [ref=e571]:
+                      - generic [ref=e573]: Indigo
+                    - button "Emerald" [ref=e574]:
+                      - generic [ref=e576]: Emerald
+                    - button "Rose" [ref=e577]:
+                      - generic [ref=e579]: Rose
+                    - button "Amber" [ref=e580]:
+                      - generic [ref=e582]: Amber
+                    - button "Violet" [ref=e583]:
+                      - generic [ref=e585]: Violet
+                    - button "Sky" [ref=e586]:
+                      - generic [ref=e588]: Sky
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e88] [cursor=pointer]:
+    - img [ref=e89]
+  - alert [ref=e483]

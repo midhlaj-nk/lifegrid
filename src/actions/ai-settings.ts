@@ -16,6 +16,7 @@ export async function getAiSettingsSafe() {
   return {
     hasGeminiKey: !!row?.geminiApiKey,
     hasOpenrouterKey: !!row?.openrouterApiKey,
+    hasUnsplashKey: !!row?.unsplashAccessKey,
     chatModel: row?.chatModel ?? "gemini-2.5-flash",
     fastModel: row?.fastModel ?? "gemini-2.5-flash-lite",
     chatProvider: row?.chatProvider ?? "gemini",
@@ -26,6 +27,7 @@ export async function getAiSettingsSafe() {
 export async function saveAiSettings(input: {
   geminiApiKey?: string;
   openrouterApiKey?: string;
+  unsplashAccessKey?: string;
   chatModel?: string;
   fastModel?: string;
   chatProvider?: "gemini" | "openrouter";
@@ -39,7 +41,7 @@ export async function saveAiSettings(input: {
 
   // empty string = leave unchanged; "CLEAR" = remove key
   const data: Record<string, string> = {};
-  for (const k of ["geminiApiKey", "openrouterApiKey"] as const) {
+  for (const k of ["geminiApiKey", "openrouterApiKey", "unsplashAccessKey"] as const) {
     const v = input[k];
     if (v === "CLEAR") data[k] = "";
     else if (v) data[k] = v;

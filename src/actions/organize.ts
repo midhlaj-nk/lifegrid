@@ -3,7 +3,7 @@
 import { db } from "@/db";
 import { areas, projects, tags } from "@/db/schema";
 import { requireUser } from "@/lib/session";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { z } from "zod";
@@ -79,6 +79,15 @@ export async function deleteProject(id: string) {
   const user = await requireUser();
   await db.delete(projects).where(and(eq(projects.id, id), eq(projects.userId, user.id)));
   revalidatePath("/", "layout");
+}
+
+export async function getTags() {
+  const user = await requireUser();
+  return db
+    .select()
+    .from(tags)
+    .where(eq(tags.userId, user.id))
+    .orderBy(asc(tags.name));
 }
 
 export async function createTag(input: { name: string; color?: string }) {

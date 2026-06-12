@@ -1,0 +1,18 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - heading "Life OS" [level=1] [ref=e5]
+      - paragraph [ref=e6]: Sign in to your workspace
+    - generic [ref=e7]:
+      - generic [ref=e8]:
+        - text: Email
+        - textbox "Email" [ref=e9]
+      - generic [ref=e10]:
+        - text: Password
+        - textbox "Password" [ref=e11]
+      - button "Sign in" [ref=e12]
+    - paragraph [ref=e13]:
+      - text: First time?
+      - link "Create the account" [ref=e14] [cursor=pointer]:
+        - /url: /sign-up
+  - region "Notifications alt+T"

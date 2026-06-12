@@ -2,9 +2,9 @@
 
 import dynamic from "next/dynamic";
 
-// BlockNote's useCreateBlockNote touches `window` at init — must not SSR.
-const NoteEditor = dynamic(
-  () => import("./note-editor").then((m) => m.NoteEditor),
+// Plate uses Slate which touches browser APIs — must not SSR.
+const PlateEditor = dynamic(
+  () => import("./plate-editor").then((m) => m.PlateEditor),
   {
     ssr: false,
     loading: () => (
@@ -17,5 +17,5 @@ export function NoteEditorShell(props: {
   noteId: string;
   initialContent: string;
 }) {
-  return <NoteEditor {...props} />;
+  return <PlateEditor {...props} />;
 }

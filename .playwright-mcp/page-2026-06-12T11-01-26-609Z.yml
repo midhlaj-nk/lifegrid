@@ -1,0 +1,45 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: Life OS
+        - generic [ref=e6]:
+          - button "Toggle theme" [ref=e7]:
+            - img [ref=e8]
+          - link "Settings" [ref=e14] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e15]
+      - navigation [ref=e18]
+    - generic [ref=e19]:
+      - banner [ref=e20]:
+        - button "Toggle sidebar" [ref=e21]:
+          - img [ref=e22]
+        - link "All apps" [ref=e24] [cursor=pointer]:
+          - /url: /apps
+          - img [ref=e25]
+        - generic [ref=e30]: Irfan
+      - main [ref=e31]:
+        - generic [ref=e33]:
+          - generic [ref=e37]:
+            - button "Change icon" [ref=e39]: 🛠️
+            - textbox "Untitled" [ref=e40]
+          - generic [ref=e41]:
+            - navigation [ref=e42]:
+              - link "Notes" [ref=e43] [cursor=pointer]:
+                - /url: /notes
+              - generic [ref=e44]:
+                - generic [ref=e45]:
+                  - button "Page" [ref=e46]:
+                    - img [ref=e47]
+                    - text: Page
+                  - button "Canvas" [ref=e50]:
+                    - img [ref=e51]
+                    - text: Canvas
+                - button "Move" [ref=e56]:
+                  - img [ref=e57]
+                  - text: Move
+            - button "Link task" [ref=e61]:
+              - img [ref=e62]
+              - text: Link task
+            - paragraph [ref=e65]: Loading editor…
+  - region "Notifications alt+T"

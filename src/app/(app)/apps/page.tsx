@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/session";
+import { LogoIconBadge } from "@/components/brand/logo";
 
 const APPS: { href: string; label: string; icon: string; color: string }[] = [
   { href: "/", label: "Dashboard", icon: "🏠", color: "#6366f1" },
@@ -23,9 +24,8 @@ export default async function AppsPage() {
 
   return (
     <div className="flex min-h-[calc(100dvh-8rem)] flex-col items-center justify-center py-8">
-      <h1 className="mb-1 text-2xl font-semibold tracking-tight">
-        Life OS
-      </h1>
+      <LogoIconBadge size={56} className="mb-3" />
+      <h1 className="mb-1 text-2xl font-semibold tracking-tight">Life Grid</h1>
       <p className="mb-8 text-sm text-muted-foreground">
         Where to, {user.name.split(" ")[0]}?
       </p>

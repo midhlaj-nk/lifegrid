@@ -6,7 +6,7 @@ export default function OfflinePage() {
       <span className="text-4xl">📡</span>
       <h1 className="text-xl font-semibold">You&apos;re offline</h1>
       <p className="max-w-sm text-sm text-muted-foreground">
-        Life OS needs a connection for live data. Previously visited pages may
+        Life Grid needs a connection for live data. Previously visited pages may
         still load — try going back, or reconnect and refresh.
       </p>
     </div>

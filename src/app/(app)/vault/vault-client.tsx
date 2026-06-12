@@ -322,7 +322,7 @@ function UnlockedView({
   function exportBackup() {
     const payload = {
       exportedAt: new Date().toISOString(),
-      note: "Life OS vault backup — ciphertext only; needs your master password to decrypt.",
+      note: "Life Grid vault backup — ciphertext only; needs your master password to decrypt.",
       items: items.map((i) => ({ id: i.id, type: i.type, data: i.data })),
     };
     const blob = new Blob([JSON.stringify(payload, null, 2)], {
@@ -351,12 +351,12 @@ function UnlockedView({
 
   return (
     <div className="space-y-4">
-      <header className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <header className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-1 items-center gap-2">
           <ShieldCheck className="h-5 w-5 text-emerald-500" />
           <h1 className="text-xl font-semibold tracking-tight">Vault</h1>
         </div>
-        <div className="flex gap-1.5">
+        <div className="flex flex-wrap gap-1.5">
           <button
             onClick={exportBackup}
             title="Download encrypted backup"
@@ -368,13 +368,13 @@ function UnlockedView({
             onClick={() => setChangingPw(true)}
             className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent"
           >
-            <KeyRound className="h-3.5 w-3.5" /> Change password
+            <KeyRound className="h-3.5 w-3.5" /> Change pw
           </button>
           <button
             onClick={onLock}
             className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-accent"
           >
-            <Lock className="h-3.5 w-3.5" /> Lock now
+            <Lock className="h-3.5 w-3.5" /> Lock
           </button>
         </div>
       </header>

@@ -6,10 +6,8 @@ import { db } from "@/db";
 import { notes, noteTaskLinks, tasks } from "@/db/schema";
 import { requireUser } from "@/lib/session";
 import { NoteEditorShell } from "@/components/notes/note-editor-shell";
-import { NoteHeader, LinkedTasks, MoveNoteButton } from "./note-client";
-import { NoteCover } from "@/components/cover-clients";
+import { NotionPageHeader, LinkedTasks, MoveNoteButton, ModeToggle } from "./note-client";
 import { NoteCanvas } from "@/components/notes/note-canvas";
-import { ModeToggle } from "./note-client";
 
 export default async function NotePage({
   params,
@@ -70,8 +68,17 @@ export default async function NotePage({
   }
 
   return (
-    <div className="space-y-4">
-      <NoteCover noteId={note.id} cover={note.cover} />
+    <div>
+      {/* Notion-style cover + icon + title — cover bleeds full-width, content self-constrains */}
+      <NotionPageHeader
+        noteId={note.id}
+        initialTitle={note.title}
+        initialIcon={note.icon}
+        initialCover={note.cover}
+      />
+
+      <div className="mx-auto max-w-3xl space-y-4 px-3 md:px-8">
+      {/* Breadcrumb nav */}
       <nav className="flex items-center gap-1 text-xs text-muted-foreground">
         <Link href="/notes" className="hover:text-foreground">
           Notes
@@ -90,8 +97,6 @@ export default async function NotePage({
         </span>
       </nav>
 
-      <NoteHeader noteId={note.id} initialTitle={note.title} initialIcon={note.icon} />
-
       <LinkedTasks
         noteId={note.id}
         linked={linkedTasks}
@@ -99,7 +104,11 @@ export default async function NotePage({
       />
 
       {note.mode === "canvas" ? (
-        <NoteCanvas noteId={note.id} initialCanvas={note.canvas} />
+        <NoteCanvas
+          noteId={note.id}
+          title={note.title}
+          initialCanvas={note.canvas}
+        />
       ) : (
         <NoteEditorShell noteId={note.id} initialContent={note.content} />
       )}
@@ -123,6 +132,7 @@ export default async function NotePage({
           </div>
         </section>
       )}
+      </div>
     </div>
   );
 }

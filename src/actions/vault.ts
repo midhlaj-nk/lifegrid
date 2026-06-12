@@ -103,3 +103,18 @@ export async function deleteVaultItem(id: string) {
     .where(and(eq(vaultItems.id, id), eq(vaultItems.userId, user.id)));
   revalidatePath("/vault");
 }
+
+/**
+ * Wipe the entire vault (meta + all items) for the authenticated user.
+ * Irreversible — only call after explicit user confirmation in the UI.
+ * Allows setup of a fresh vault after the master password is lost.
+ */
+export async function nukeVault() {
+  const user = await requireUser();
+  await db.transaction(async (tx) => {
+    await tx.delete(vaultItems).where(eq(vaultItems.userId, user.id));
+    await tx.delete(vaultMeta).where(eq(vaultMeta.userId, user.id));
+  });
+  revalidatePath("/vault");
+  return { ok: true };
+}

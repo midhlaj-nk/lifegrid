@@ -141,10 +141,10 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
         href={href}
         onClick={onNavigate}
         className={cn(
-          "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-colors",
+          "flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm transition-[background-color,border-color,color]",
           active
-            ? "bg-accent text-accent-foreground font-medium"
-            : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+            ? "bg-accent text-accent-foreground font-medium border-l-2 border-primary pl-[9px]"
+            : "text-muted-foreground hover:bg-accent/50 hover:text-foreground border-l-2 border-transparent pl-[9px]"
         )}
       >
         {Icon ? (
@@ -196,13 +196,20 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
       {SECTIONS.map((section) => (
         <div key={section.key}>
           <SectionHeader sectionKey={section.key} label={section.label} />
-          {isOpen(section.key) && (
-            <div className="space-y-0.5">
-              {section.links.map((l) =>
-                navLink(l.href, l.label, undefined, l.icon)
-              )}
+          <div
+            className={cn(
+              "grid transition-[grid-template-rows,opacity] duration-200 ease-in-out",
+              isOpen(section.key) ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+            )}
+          >
+            <div className="overflow-hidden">
+              <div className="space-y-0.5 pb-0.5">
+                {section.links.map((l) =>
+                  navLink(l.href, l.label, undefined, l.icon)
+                )}
+              </div>
             </div>
-          )}
+          </div>
         </div>
       ))}
 
@@ -221,8 +228,14 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
             </CreateAreaDialog>
           }
         />
-        {isOpen("areas") && (
-          <div className="space-y-0.5">
+        <div
+          className={cn(
+            "grid transition-[grid-template-rows,opacity] duration-200 ease-in-out",
+            isOpen("areas") ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          )}
+        >
+          <div className="overflow-hidden">
+            <div className="space-y-0.5 pb-0.5">
             {areas.map((area) => {
               const areaProjects = projects.filter((p) => p.areaId === area.id);
               const isCollapsed = areaCollapsed[area.id];
@@ -283,8 +296,9 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
                 Group life into areas — Work, Health…
               </p>
             )}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       <div>
@@ -302,49 +316,65 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
             </CreateProjectDialog>
           }
         />
-        {isOpen("projects") && (
-          <div className="space-y-0.5">
-            {looseProjects.map((p) => (
-              <div key={p.id} className="group/proj flex items-center">
-                <div className="flex-1">
-                  {navLink(`/project/${p.id}`, p.name, p.color)}
+        <div
+          className={cn(
+            "grid transition-[grid-template-rows,opacity] duration-200 ease-in-out",
+            isOpen("projects") ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          )}
+        >
+          <div className="overflow-hidden">
+            <div className="space-y-0.5 pb-0.5">
+              {looseProjects.map((p) => (
+                <div key={p.id} className="group/proj flex items-center">
+                  <div className="flex-1">
+                    {navLink(`/project/${p.id}`, p.name, p.color)}
+                  </div>
+                  <button
+                    onClick={() => setEditingProject(p)}
+                    className="hidden rounded p-0.5 text-muted-foreground hover:text-foreground group-hover/proj:block touch:block"
+                    aria-label={`Edit ${p.name}`}
+                  >
+                    <Pencil className="h-3 w-3" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => setEditingProject(p)}
-                  className="hidden rounded p-0.5 text-muted-foreground hover:text-foreground group-hover/proj:block touch:block"
-                  aria-label={`Edit ${p.name}`}
-                >
-                  <Pencil className="h-3 w-3" />
-                </button>
-              </div>
-            ))}
-            {looseProjects.length === 0 && (
-              <p className="px-2.5 text-xs text-muted-foreground/60">
-                Projects without an area appear here
-              </p>
-            )}
+              ))}
+              {looseProjects.length === 0 && (
+                <p className="px-2.5 text-xs text-muted-foreground/60">
+                  Projects without an area appear here
+                </p>
+              )}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       {tags.length > 0 && (
         <div>
           <SectionHeader sectionKey="tags" label="Tags" />
-          {isOpen("tags") && (
-            <div className="flex flex-wrap gap-1 px-2.5">
-              {tags.map((t) => (
-                <Link
-                  key={t.id}
-                  href={`/tag/${t.id}`}
-                  onClick={onNavigate}
-                  className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground hover:bg-accent"
-                >
-                  <TagIcon className="h-3 w-3" style={{ color: t.color }} />
-                  {t.name}
-                </Link>
-              ))}
+          <div
+            className={cn(
+              "grid transition-[grid-template-rows,opacity] duration-200 ease-in-out",
+              isOpen("tags") ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+            )}
+          >
+            <div className="overflow-hidden">
+              <div className="space-y-0.5 pb-0.5">
+                <div className="flex flex-wrap gap-1 px-2.5">
+                  {tags.map((t) => (
+                    <Link
+                      key={t.id}
+                      href={`/tag/${t.id}`}
+                      onClick={onNavigate}
+                      className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-xs text-muted-foreground hover:bg-accent"
+                    >
+                      <TagIcon className="h-3 w-3" style={{ color: t.color }} />
+                      {t.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
-          )}
+          </div>
         </div>
       )}
 

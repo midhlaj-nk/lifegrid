@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signUp } from "@/lib/auth-client";
+import { LogoIconBadge } from "@/components/brand/logo";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -30,11 +31,14 @@ export default function SignUpPage() {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm space-y-6">
-        <div className="space-y-1 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">Life OS</h1>
-          <p className="text-sm text-muted-foreground">
-            Create your account — registration closes after the first one.
-          </p>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <LogoIconBadge size={48} />
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight">Life Grid</h1>
+            <p className="mt-0.5 text-sm text-muted-foreground">
+              Create your account — registration closes after the first one.
+            </p>
+          </div>
         </div>
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">

@@ -92,9 +92,12 @@ export function SheetEditor({
       clearInterval(interval);
       resizeTicks.forEach(clearTimeout);
       window.removeEventListener("beforeunload", onLeave);
-      persist();
-      univer.dispose();
+      // Use beacon path — avoids setSaveState on unmounting component.
+      onLeave();
       apiRef.current = null;
+      // 200ms gives React time to finish the current concurrent render pass
+      // before Univer tears down its internal React root.
+      setTimeout(() => univer.dispose(), 200);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sheetId]);

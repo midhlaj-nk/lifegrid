@@ -2,10 +2,11 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Life OS",
-    short_name: "Life OS",
+    name: "Life Grid",
+    short_name: "Life Grid",
     description: "Personal productivity hub — tasks, notes, planning.",
     start_url: "/",
+    scope: "/",
     display: "standalone",
     background_color: "#0a0a0a",
     theme_color: "#0a0a0a",

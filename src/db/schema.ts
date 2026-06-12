@@ -145,6 +145,7 @@ export const aiSettings = pgTable("ai_settings", {
   // "gemini" | "openrouter"
   chatProvider: text("chat_provider").notNull().default("gemini"),
   fastProvider: text("fast_provider").notNull().default("gemini"),
+  unsplashAccessKey: text("unsplash_access_key").notNull().default(""),
 });
 
 // ---------- Finance (standalone module; amounts in integer paise) ----------

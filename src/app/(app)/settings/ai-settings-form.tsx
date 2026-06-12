@@ -7,6 +7,7 @@ import { saveAiSettings } from "@/actions/ai-settings";
 interface Props {
   hasGeminiKey: boolean;
   hasOpenrouterKey: boolean;
+  hasUnsplashKey: boolean;
   chatModel: string;
   fastModel: string;
   chatProvider: string;
@@ -19,6 +20,7 @@ const input =
 export function AiSettingsForm(props: Props) {
   const [geminiKey, setGeminiKey] = useState("");
   const [orKey, setOrKey] = useState("");
+  const [unsplashKey, setUnsplashKey] = useState("");
   const [chatModel, setChatModel] = useState(props.chatModel);
   const [fastModel, setFastModel] = useState(props.fastModel);
   const [chatProvider, setChatProvider] = useState(props.chatProvider);
@@ -30,6 +32,7 @@ export function AiSettingsForm(props: Props) {
       await saveAiSettings({
         geminiApiKey: geminiKey || undefined,
         openrouterApiKey: orKey || undefined,
+        unsplashAccessKey: unsplashKey || undefined,
         chatModel,
         fastModel,
         chatProvider: chatProvider as "gemini" | "openrouter",
@@ -37,6 +40,7 @@ export function AiSettingsForm(props: Props) {
       });
       setGeminiKey("");
       setOrKey("");
+      setUnsplashKey("");
       toast.success("AI settings saved");
     });
   }
@@ -68,6 +72,28 @@ export function AiSettingsForm(props: Props) {
             className={input}
           />
         </div>
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-xs text-muted-foreground">
+          Unsplash Access Key {props.hasUnsplashKey && "· saved ✓"}{" "}
+          <a
+            href="https://unsplash.com/developers"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            Get free key ↗
+          </a>
+        </label>
+        <input
+          type="password"
+          placeholder={props.hasUnsplashKey ? "•••••• (keep)" : "your-unsplash-access-key"}
+          value={unsplashKey}
+          onChange={(e) => setUnsplashKey(e.target.value)}
+          className={input}
+        />
+        <p className="text-[11px] text-muted-foreground">Used for cover photo search in Notes. Free tier = 50 req/hr.</p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">

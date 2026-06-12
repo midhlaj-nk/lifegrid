@@ -1,0 +1,116 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: Life OS
+        - generic [ref=e6]:
+          - button "Toggle theme" [ref=e7]:
+            - img [ref=e8]
+          - link "Settings" [ref=e10] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e11]
+      - navigation [ref=e14]
+    - generic [ref=e15]:
+      - banner [ref=e16]:
+        - button "Toggle sidebar" [ref=e17]:
+          - img [ref=e18]
+        - link "All apps" [ref=e20] [cursor=pointer]:
+          - /url: /apps
+          - img [ref=e21]
+        - generic [ref=e26]: Irfan
+      - main [ref=e27]:
+        - generic [ref=e29]:
+          - generic [ref=e30]:
+            - generic [ref=e31]:
+              - heading "Hello, Irfan" [level=1] [ref=e32]
+              - paragraph [ref=e34]: Friday, 12 June 2026
+            - button "Edit" [ref=e35]:
+              - img [ref=e36]
+              - text: Edit
+          - generic [ref=e39]:
+            - generic [ref=e41]:
+              - generic [ref=e42]:
+                - heading "Today's tasks" [level=2] [ref=e43]
+                - link "View all →" [ref=e44] [cursor=pointer]:
+                  - /url: /today
+              - generic [ref=e45]:
+                - button "Complete task" [ref=e46]
+                - generic [ref=e47]: study for interview
+                - generic [ref=e48]: 11 Jun
+              - generic [ref=e49]:
+                - button "Complete task" [ref=e50]
+                - generic [ref=e51]: E2E demo task
+                - generic [ref=e52]: 11 Jun
+              - generic [ref=e53]:
+                - button "Complete task" [ref=e54]
+                - generic [ref=e55]: review e2e results
+                - generic [ref=e56]: 12 Jun
+              - paragraph [ref=e57]: 2 overdue
+            - generic [ref=e59]:
+              - generic [ref=e60]:
+                - heading "Countdowns" [level=2] [ref=e61]
+                - link "View all →" [ref=e62] [cursor=pointer]:
+                  - /url: /events
+              - generic [ref=e63]:
+                - generic [ref=e64]:
+                  - generic [ref=e65]: 🎉
+                  - generic [ref=e66]: E2E launch day
+                  - generic [ref=e67]: D-19
+                - generic [ref=e68]:
+                  - generic [ref=e69]: 🎉
+                  - generic [ref=e70]: BEEBEE Birthday
+                  - generic [ref=e71]: D-54
+            - generic [ref=e73]:
+              - generic [ref=e74]:
+                - heading "Habits today" [level=2] [ref=e75]
+                - link "View all →" [ref=e76] [cursor=pointer]:
+                  - /url: /habits
+              - button "💪 E2E meditation" [ref=e78]:
+                - generic [ref=e80]: 💪
+                - generic [ref=e81]: E2E meditation
+            - generic [ref=e83]:
+              - generic [ref=e84]:
+                - heading "Upcoming" [level=2] [ref=e85]
+                - link "View all →" [ref=e86] [cursor=pointer]:
+                  - /url: /upcoming
+              - paragraph [ref=e87]: Nothing scheduled.
+            - generic [ref=e89]:
+              - generic [ref=e90]:
+                - heading "Goals" [level=2] [ref=e91]
+                - link "View all →" [ref=e92] [cursor=pointer]:
+                  - /url: /goals
+              - generic [ref=e93]:
+                - generic [ref=e95]:
+                  - generic [ref=e96]: Get JOb
+                  - generic [ref=e97]: 0%
+                - generic [ref=e100]:
+                  - generic [ref=e101]: E2E ship v2
+                  - generic [ref=e102]: 0%
+            - generic [ref=e105]:
+              - generic [ref=e106]:
+                - heading "Recent notes" [level=2] [ref=e107]
+                - link "View all →" [ref=e108] [cursor=pointer]:
+                  - /url: /notes
+              - generic [ref=e109]:
+                - link "Untitled" [ref=e110] [cursor=pointer]:
+                  - /url: /notes/c5261570-9199-47a4-9ca9-a1a0922a4272
+                  - generic [ref=e111]: Untitled
+                - link "📄 Untitled" [ref=e112] [cursor=pointer]:
+                  - /url: /notes/29d40e2e-895a-481d-b4ce-865ec90a1ab8
+                  - generic [ref=e113]: 📄
+                  - generic [ref=e114]: Untitled
+                - link "📄 Untitled" [ref=e115] [cursor=pointer]:
+                  - /url: /notes/3d75c266-f369-4bba-9c46-ee826f4b8761
+                  - generic [ref=e116]: 📄
+                  - generic [ref=e117]: Untitled
+                - link "📄 E2E meeting notes" [ref=e118] [cursor=pointer]:
+                  - /url: /notes/99aaa9d6-8e09-4e95-8388-a1002cf05773
+                  - generic [ref=e119]: 📄
+                  - generic [ref=e120]: E2E meeting notes
+                - link "📄 list in a list" [ref=e121] [cursor=pointer]:
+                  - /url: /notes/49f6bd67-5900-493c-8ae7-a1286753d0f5
+                  - generic [ref=e122]: 📄
+                  - generic [ref=e123]: list in a list
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e129] [cursor=pointer]:
+    - img [ref=e130]

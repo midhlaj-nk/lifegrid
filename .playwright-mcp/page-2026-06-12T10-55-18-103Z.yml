@@ -1,0 +1,64 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e5]: Life OS
+        - generic [ref=e6]:
+          - button "Toggle theme" [ref=e7]:
+            - img [ref=e8]
+          - link "Settings" [ref=e14] [cursor=pointer]:
+            - /url: /settings
+            - img [ref=e15]
+      - navigation [ref=e18]
+    - generic [ref=e19]:
+      - banner [ref=e20]:
+        - button "Toggle sidebar" [ref=e21]:
+          - img [ref=e22]
+        - link "All apps" [ref=e24] [cursor=pointer]:
+          - /url: /apps
+          - img [ref=e25]
+        - generic [ref=e30]: Irfan
+      - main [ref=e31]:
+        - generic [ref=e33]:
+          - generic [ref=e34]:
+            - heading "Notes" [level=1] [ref=e35]
+            - generic [ref=e36]:
+              - button "gallery view" [ref=e37]:
+                - img [ref=e38]
+              - button "tree view" [ref=e43]:
+                - img [ref=e44]
+          - generic [ref=e47]:
+            - button "New page" [ref=e48]:
+              - img [ref=e49]
+              - text: New page
+            - generic [ref=e50]:
+              - img [ref=e51]
+              - textbox "Search pages…" [ref=e54]
+          - generic [ref=e55]:
+            - link "🛠️ Untitled 9 minutes ago" [ref=e56] [cursor=pointer]:
+              - /url: /notes/c5261570-9199-47a4-9ca9-a1a0922a4272
+              - generic [ref=e58]: 🛠️
+              - generic [ref=e59]:
+                - paragraph [ref=e60]: Untitled
+                - paragraph [ref=e61]: 9 minutes ago
+            - link "📄 Untitled about 1 hour ago" [ref=e62] [cursor=pointer]:
+              - /url: /notes/29d40e2e-895a-481d-b4ce-865ec90a1ab8
+              - generic [ref=e64]: 📄
+              - generic [ref=e65]:
+                - paragraph [ref=e66]: Untitled
+                - paragraph [ref=e67]: about 1 hour ago
+            - link "📄 Untitled about 4 hours ago · 1 subpage" [ref=e68] [cursor=pointer]:
+              - /url: /notes/3d75c266-f369-4bba-9c46-ee826f4b8761
+              - generic [ref=e70]: 📄
+              - generic [ref=e71]:
+                - paragraph [ref=e72]: Untitled
+                - paragraph [ref=e73]: about 4 hours ago · 1 subpage
+            - link "📄 E2E meeting notes about 4 hours ago" [ref=e74] [cursor=pointer]:
+              - /url: /notes/99aaa9d6-8e09-4e95-8388-a1002cf05773
+              - generic [ref=e76]: 📄
+              - generic [ref=e77]:
+                - paragraph [ref=e78]: E2E meeting notes
+                - paragraph [ref=e79]: about 4 hours ago
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e85] [cursor=pointer]:
+    - img [ref=e86]

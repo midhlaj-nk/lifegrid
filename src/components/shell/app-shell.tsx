@@ -5,8 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutGrid, Moon, PanelLeft, Settings, Sun, X } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
+import { LogoMark } from "@/components/brand/logo";
 import { Sidebar } from "./sidebar";
 import { MobileBottomNav } from "./mobile-nav";
+import { PageTransition } from "./page-transition";
 import { cn } from "@/lib/utils";
 
 interface AppShellProps {
@@ -36,7 +38,7 @@ export function AppShell({ areas, projects, tags, userName, children }: AppShell
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   // wide canvases need the full viewport
-  const fullWidth = pathname.startsWith("/sheets/") || pathname.startsWith("/apps");
+  const fullWidth = pathname.startsWith("/sheets/") || pathname.startsWith("/apps") || pathname.startsWith("/notes/");
 
   return (
     <div className="flex min-h-dvh">
@@ -48,7 +50,7 @@ export function AppShell({ areas, projects, tags, userName, children }: AppShell
         )}
       >
         <div className="flex items-center justify-between px-3 pt-3">
-          <span className="px-2 text-sm font-semibold tracking-tight">Life OS</span>
+          <LogoMark iconSize={18} className="px-2 text-sm" />
           <div className="flex items-center">
             <ThemeToggle />
             <Link
@@ -72,7 +74,7 @@ export function AppShell({ areas, projects, tags, userName, children }: AppShell
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-3 pt-3">
-              <span className="px-2 text-sm font-semibold">Life OS</span>
+              <LogoMark iconSize={18} className="px-2 text-sm" />
               <div className="flex items-center">
                 <ThemeToggle />
                 <Link
@@ -119,7 +121,7 @@ export function AppShell({ areas, projects, tags, userName, children }: AppShell
           >
             <LayoutGrid className="h-4 w-4" />
           </Link>
-          <span className="text-sm font-semibold md:hidden">Life OS</span>
+          <LogoMark iconSize={16} className="text-sm md:hidden" />
           <div className="ml-auto flex items-center gap-1 md:hidden">
             <ThemeToggle />
           </div>
@@ -127,10 +129,10 @@ export function AppShell({ areas, projects, tags, userName, children }: AppShell
             {userName}
           </span>
         </header>
-        <main className="flex-1 px-3 pb-24 pt-4 md:px-8 md:pb-8">
-          <div className={cn("mx-auto w-full", fullWidth ? "max-w-none" : "max-w-3xl")}>
+        <main className="pb-safe-nav flex-1 px-3 pt-4 md:px-8 md:pb-8">
+          <PageTransition className={cn("mx-auto w-full", fullWidth ? "max-w-none" : "max-w-3xl")}>
             {children}
-          </div>
+          </PageTransition>
         </main>
       </div>
 

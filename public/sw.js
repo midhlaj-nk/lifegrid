@@ -1,5 +1,5 @@
-const STATIC_CACHE = "lifeos-static-v1";
-const PAGE_CACHE = "lifeos-pages-v1";
+const STATIC_CACHE = "lifeos-static-v2";
+const PAGE_CACHE = "lifeos-pages-v2";
 const OFFLINE_URL = "/offline";
 
 self.addEventListener("install", (event) => {

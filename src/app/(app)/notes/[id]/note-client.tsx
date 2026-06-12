@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useCallback, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { FolderInput, Link2, PenTool, FileText, X } from "lucide-react";
+import dynamic from "next/dynamic";
+import { FolderInput, ImagePlus, Link2, PenTool, FileText, Search, SmilePlus, Trash2, Upload, X } from "lucide-react";
+import { toast } from "sonner";
 import { updateNote, linkNoteToTask, unlinkNoteFromTask } from "@/actions/notes";
 import { AppModal } from "@/components/ui/app-dialog";
 import { cn } from "@/lib/utils";
+import { COVER_GRADIENTS, coverStyle } from "@/components/cover-header";
+
+const EmojiPickerReact = dynamic(() => import("emoji-picker-react"), { ssr: false });
 
 export function ModeToggle({
   noteId,
@@ -114,54 +119,309 @@ export function MoveNoteButton({
   );
 }
 
-export function NoteHeader({
+function EmojiPicker({ onPick, onRemove }: { onPick: (e: string) => void; onRemove: () => void }) {
+  return (
+    <div className="animate-scale-in absolute left-0 top-full z-20 mt-1 rounded-xl border border-border bg-popover shadow-xl overflow-hidden">
+      <EmojiPickerReact
+        onEmojiClick={(data) => onPick(data.emoji)}
+        height={380}
+        width={320}
+        searchPlaceholder="Search emoji…"
+        lazyLoadEmojis
+      />
+      <div className="border-t border-border px-3 py-2">
+        <button
+          onClick={onRemove}
+          className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
+        >
+          <X className="h-3 w-3" /> Remove icon
+        </button>
+      </div>
+    </div>
+  );
+}
+
+type UnsplashPhoto = { id: string; regular: string; small: string; credit: string };
+
+function CoverPicker({
+  onPick,
+  onUpload,
+  onRemove,
+  uploading,
+}: {
+  onPick: (c: string) => void;
+  onUpload: () => void;
+  onRemove: () => void;
+  uploading: boolean;
+}) {
+  const [tab, setTab] = useState<"gradients" | "photos">("gradients");
+  const [query, setQuery] = useState("nature");
+  const [photos, setPhotos] = useState<UnsplashPhoto[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [noKey, setNoKey] = useState(false);
+
+  const search = useCallback(async (q: string) => {
+    setSearching(true);
+    setNoKey(false);
+    try {
+      const res = await fetch(`/api/unsplash?q=${encodeURIComponent(q)}`);
+      if (res.status === 503) { setNoKey(true); return; }
+      const data = await res.json();
+      setPhotos(data.photos ?? []);
+    } catch {
+      toast.error("Photo search failed");
+    } finally {
+      setSearching(false);
+    }
+  }, []);
+
+  const switchToPhotos = useCallback(() => {
+    setTab("photos");
+    if (photos.length === 0) search(query);
+  }, [photos.length, query, search]);
+
+  return (
+    <div className="animate-scale-in absolute right-3 top-full z-20 mt-1 w-80 rounded-xl border border-border bg-popover shadow-xl">
+      {/* Tabs */}
+      <div className="flex gap-1 border-b border-border px-3 pt-2">
+        {(["gradients", "photos"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => t === "photos" ? switchToPhotos() : setTab(t)}
+            className={cn(
+              "rounded-t px-3 py-1.5 text-[11px] font-medium capitalize",
+              tab === t ? "border-b-2 border-primary text-foreground" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      <div className="p-3">
+        {tab === "gradients" && (
+          <div className="grid grid-cols-4 gap-2">
+            {Object.entries(COVER_GRADIENTS).map(([key, css]) => (
+              <button
+                key={key}
+                onClick={() => onPick(key)}
+                className="h-10 rounded-lg transition-transform hover:scale-105"
+                style={{ backgroundImage: css }}
+                aria-label={key}
+              />
+            ))}
+          </div>
+        )}
+
+        {tab === "photos" && (
+          <div className="space-y-2">
+            {noKey ? (
+              <p className="py-4 text-center text-xs text-muted-foreground">
+                Add <code className="rounded bg-muted px-1">UNSPLASH_ACCESS_KEY</code> to <code className="rounded bg-muted px-1">.env.local</code> to enable photo search.
+              </p>
+            ) : (
+              <>
+                <div className="flex gap-1.5">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && search(query)}
+                      placeholder="Search photos…"
+                      className="h-7 w-full rounded-md border border-border bg-background pl-7 pr-2 text-xs outline-none focus:ring-1 focus:ring-ring"
+                    />
+                  </div>
+                  <button
+                    onClick={() => search(query)}
+                    disabled={searching}
+                    className="h-7 rounded-md border border-border px-2.5 text-xs hover:bg-accent disabled:opacity-50"
+                  >
+                    {searching ? "…" : "Go"}
+                  </button>
+                </div>
+                <div className="grid max-h-52 grid-cols-2 gap-1.5 overflow-y-auto">
+                  {photos.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => onPick(p.regular)}
+                      className="group relative h-16 overflow-hidden rounded-md"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={p.small} alt={p.credit} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                      <span className="absolute bottom-0 left-0 right-0 truncate bg-black/50 px-1 py-0.5 text-[9px] text-white opacity-0 group-hover:opacity-100">
+                        {p.credit}
+                      </span>
+                    </button>
+                  ))}
+                  {!searching && photos.length === 0 && (
+                    <p className="col-span-2 py-6 text-center text-xs text-muted-foreground">No results</p>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        <div className="mt-3 flex gap-2 border-t border-border pt-3">
+          <button
+            onClick={onUpload}
+            disabled={uploading}
+            className="inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-md border border-border text-xs hover:bg-accent disabled:opacity-50"
+          >
+            <Upload className="h-3.5 w-3.5" />
+            {uploading ? "Uploading…" : "Upload image"}
+          </button>
+          <button
+            onClick={onRemove}
+            className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md border border-border px-3 text-xs text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="h-3.5 w-3.5" /> Remove
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function NotionPageHeader({
   noteId,
   initialTitle,
   initialIcon,
+  initialCover,
 }: {
   noteId: string;
   initialTitle: string;
   initialIcon: string;
+  initialCover: string;
 }) {
   const [title, setTitle] = useState(initialTitle);
   const [icon, setIcon] = useState(initialIcon);
+  const [cover, setCover] = useState(initialCover);
   const [pickingIcon, setPickingIcon] = useState(false);
+  const [pickingCover, setPickingCover] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const hasCover = !!cover;
+  const style = coverStyle(cover);
+
+  async function uploadCover(file: File) {
+    setUploading(true);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      if (!res.ok) throw new Error("Upload failed");
+      const { url } = await res.json();
+      setCover(url);
+      await updateNote(noteId, { cover: url });
+      setPickingCover(false);
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setUploading(false);
+    }
+  }
 
   return (
-    <div className="flex items-center gap-2">
-      <div className="relative">
-        <button
-          onClick={() => setPickingIcon((v) => !v)}
-          className="rounded-md p-1 text-2xl hover:bg-accent"
-          aria-label="Change icon"
-        >
-          {icon}
-        </button>
-        {pickingIcon && (
-          <div className="absolute top-11 z-10 grid w-44 grid-cols-6 gap-1 rounded-md border border-border bg-popover p-2 shadow-md">
-            {["📄","📝","💡","📌","📚","🧠","💼","🏠","💰","🛠️","🎯","🗂️","🧪","🌱","✈️","❤️","⭐","🔥"].map((e) => (
-              <button
-                key={e}
-                onClick={() => {
-                  setIcon(e);
-                  setPickingIcon(false);
-                  updateNote(noteId, { icon: e });
-                }}
-                className="rounded p-1 text-lg hover:bg-accent"
-              >
-                {e}
-              </button>
-            ))}
+    <div className="group/page">
+      {/* ── Cover ── */}
+      {hasCover ? (
+        <div className="relative -mx-3 -mt-4 md:-mx-8">
+          <div className="h-44 w-full md:h-56" style={style ?? undefined} />
+          {/* Change / remove cover — bottom-right on hover */}
+          <div className="absolute bottom-3 right-3 hidden gap-1.5 group-hover/page:flex">
+            <button
+              onClick={() => setPickingCover((v) => !v)}
+              className="rounded-lg bg-black/50 px-3 py-1.5 text-xs font-medium text-white backdrop-blur hover:bg-black/70"
+            >
+              Change cover
+            </button>
           </div>
-        )}
+          {pickingCover && (
+            <CoverPicker
+              onPick={(c) => { setCover(c); updateNote(noteId, { cover: c }); setPickingCover(false); }}
+              onUpload={() => fileRef.current?.click()}
+              onRemove={() => { setCover(""); updateNote(noteId, { cover: "" }); setPickingCover(false); }}
+              uploading={uploading}
+            />
+          )}
+        </div>
+      ) : null}
+
+      {/* ── Icon + action buttons area ── */}
+      <div className={cn("relative mx-auto max-w-3xl px-3 md:px-8", hasCover ? "-mt-8" : "mt-6")}>
+        {/* Large Notion-style icon */}
+        {icon ? (
+          <div className="relative mb-3 inline-block">
+            <button
+              onClick={() => { setPickingIcon((v) => !v); setPickingCover(false); }}
+              className="block rounded-xl p-1 text-[4.5rem] leading-none transition-transform hover:scale-105 hover:bg-accent/30"
+              aria-label="Change icon"
+            >
+              {icon}
+            </button>
+            {pickingIcon && (
+              <EmojiPicker
+                onPick={(e) => { setIcon(e); setPickingIcon(false); updateNote(noteId, { icon: e }); }}
+                onRemove={() => { setIcon(""); setPickingIcon(false); updateNote(noteId, { icon: "" }); }}
+              />
+            )}
+          </div>
+        ) : null}
+
+        {/* "Add icon" / "Add cover" — shown on hover when missing */}
+        <div className="mb-2 flex flex-wrap gap-2 opacity-0 transition-opacity group-hover/page:opacity-100">
+          {!icon && (
+            <button
+              onClick={() => { setPickingIcon(true); setPickingCover(false); }}
+              className="relative inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
+            >
+              <SmilePlus className="h-3.5 w-3.5" /> Add icon
+              {pickingIcon && (
+                <EmojiPicker
+                  onPick={(e) => { setIcon(e); setPickingIcon(false); updateNote(noteId, { icon: e }); }}
+                  onRemove={() => { setIcon(""); setPickingIcon(false); updateNote(noteId, { icon: "" }); }}
+                />
+              )}
+            </button>
+          )}
+          {!hasCover && (
+            <button
+              onClick={() => { setPickingCover((v) => !v); setPickingIcon(false); }}
+              className="relative inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
+            >
+              <ImagePlus className="h-3.5 w-3.5" /> Add cover
+              {pickingCover && (
+                <CoverPicker
+                  onPick={(c) => { setCover(c); updateNote(noteId, { cover: c }); setPickingCover(false); }}
+                  onUpload={() => fileRef.current?.click()}
+                  onRemove={() => { setCover(""); updateNote(noteId, { cover: "" }); setPickingCover(false); }}
+                  uploading={uploading}
+                />
+              )}
+            </button>
+          )}
+        </div>
+
+        {/* Title — large H1 style */}
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onBlur={() => updateNote(noteId, { title: title.trim() || "Untitled" })}
+          onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
+          placeholder="Untitled"
+          className="w-full bg-transparent text-[2rem] font-bold leading-tight tracking-tight outline-none placeholder:text-muted-foreground/30 md:text-[2.5rem]"
+        />
       </div>
+
+      {/* Hidden file input for cover upload */}
       <input
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        onBlur={() => updateNote(noteId, { title: title.trim() || "Untitled" })}
-        onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
-        placeholder="Untitled"
-        className="w-full bg-transparent text-2xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/50"
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => { const f = e.target.files?.[0]; if (f) uploadCover(f); }}
       />
     </div>
   );
