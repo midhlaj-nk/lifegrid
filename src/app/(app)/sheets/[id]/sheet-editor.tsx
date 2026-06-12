@@ -49,6 +49,12 @@ export function SheetEditor({
     }
     univerAPI.createWorkbook(snapshot ?? { name: initialName });
 
+    // Univer captures container size at init; inside a flex layout the
+    // container may still be collapsing. Nudge it to recompute once laid out.
+    const resizeTicks = [50, 250, 600, 1200].map((ms) =>
+      setTimeout(() => window.dispatchEvent(new Event("resize")), ms)
+    );
+
     async function persist() {
       const wb = apiRef.current?.getActiveWorkbook();
       if (!wb) return;
@@ -84,6 +90,7 @@ export function SheetEditor({
 
     return () => {
       clearInterval(interval);
+      resizeTicks.forEach(clearTimeout);
       window.removeEventListener("beforeunload", onLeave);
       persist();
       univer.dispose();
@@ -92,9 +99,11 @@ export function SheetEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sheetId]);
 
+  // True fullscreen: fixed overlay escaping the app shell (sidebar, header,
+  // padding, bottom nav). Univer needs the whole viewport to be usable.
   return (
-    <div className="-mx-3 flex h-[calc(100dvh-7rem)] flex-col md:-mx-8 md:h-[calc(100dvh-5rem)]">
-      <div className="flex items-center gap-2 px-3 pb-2 md:px-4">
+    <div className="fixed inset-0 z-50 flex flex-col bg-background">
+      <div className="flex items-center gap-2 border-b border-border px-3 py-2">
         <Link
           href="/sheets"
           className="rounded-md p-1.5 text-muted-foreground hover:bg-accent"

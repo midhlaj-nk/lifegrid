@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import {
@@ -121,9 +121,24 @@ export function Dashboard({
     });
   }
 
-  const hour = new Date().getHours();
-  const greeting =
-    hour < 5 ? "Up late" : hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  // greeting depends on the viewer's local clock — compute after mount so
+  // server (UTC) and client (local tz) renders agree (no hydration mismatch)
+  const [greeting, setGreeting] = useState("Hello");
+  useEffect(() => {
+    const hour = new Date().getHours();
+    setGreeting(
+      hour < 5
+        ? "Up late"
+        : hour < 12
+          ? "Good morning"
+          : hour < 17
+            ? "Good afternoon"
+            : "Good evening"
+    );
+  }, []);
+
+  // date is deterministic from the server-provided day string
+  const prettyDate = format(parseISO(data.today), "EEEE, d MMMM yyyy");
 
   return (
     <div className="space-y-6">
@@ -133,9 +148,7 @@ export function Dashboard({
             {greeting}, {userName.split(" ")[0]}
           </h1>
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm text-muted-foreground">
-              {format(new Date(), "EEEE, d MMMM yyyy")}
-            </p>
+            <p className="text-sm text-muted-foreground">{prettyDate}</p>
             <WeatherChip />
           </div>
         </div>
