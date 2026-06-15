@@ -1,31 +1,36 @@
+import { sql } from "drizzle-orm";
 import {
-  pgTable,
+  sqliteTable,
   text,
-  timestamp,
-  boolean,
   integer,
-  date,
   primaryKey,
-} from "drizzle-orm/pg-core";
+} from "drizzle-orm/sqlite-core";
+
+// Helpers ---------------------------------------------------------------
+// timestamp columns stored as unix epoch seconds; drizzle converts Date <-> number
+const ts = (name: string) => integer(name, { mode: "timestamp" });
+const tsNow = (name: string) =>
+  integer(name, { mode: "timestamp" }).default(sql`(unixepoch())`);
+const bool = (name: string) => integer(name, { mode: "boolean" });
 
 // ---------- Better Auth tables ----------
 
-export const user = pgTable("user", {
+export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
-  emailVerified: boolean("email_verified").notNull().default(false),
+  emailVerified: bool("email_verified").notNull().default(false),
   image: text("image"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
+  updatedAt: tsNow("updated_at").notNull(),
 });
 
-export const session = pgTable("session", {
+export const session = sqliteTable("session", {
   id: text("id").primaryKey(),
-  expiresAt: timestamp("expires_at").notNull(),
+  expiresAt: ts("expires_at").notNull(),
   token: text("token").notNull().unique(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
+  updatedAt: tsNow("updated_at").notNull(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
   userId: text("user_id")
@@ -33,7 +38,7 @@ export const session = pgTable("session", {
     .references(() => user.id, { onDelete: "cascade" }),
 });
 
-export const account = pgTable("account", {
+export const account = sqliteTable("account", {
   id: text("id").primaryKey(),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
@@ -43,26 +48,26 @@ export const account = pgTable("account", {
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
   idToken: text("id_token"),
-  accessTokenExpiresAt: timestamp("access_token_expires_at"),
-  refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+  accessTokenExpiresAt: ts("access_token_expires_at"),
+  refreshTokenExpiresAt: ts("refresh_token_expires_at"),
   scope: text("scope"),
   password: text("password"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
+  updatedAt: tsNow("updated_at").notNull(),
 });
 
-export const verification = pgTable("verification", {
+export const verification = sqliteTable("verification", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
-  expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  expiresAt: ts("expires_at").notNull(),
+  createdAt: tsNow("created_at"),
+  updatedAt: tsNow("updated_at"),
 });
 
 // ---------- Life OS: organization ----------
 
-export const areas = pgTable("areas", {
+export const areas = sqliteTable("areas", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -72,10 +77,10 @@ export const areas = pgTable("areas", {
   icon: text("icon").notNull().default("folder"),
   cover: text("cover").notNull().default(""),
   sortOrder: integer("sort_order").notNull().default(0),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
 });
 
-export const projects = pgTable("projects", {
+export const projects = sqliteTable("projects", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -84,26 +89,26 @@ export const projects = pgTable("projects", {
   name: text("name").notNull(),
   color: text("color").notNull().default("#8b5cf6"),
   sortOrder: integer("sort_order").notNull().default(0),
-  archived: boolean("archived").notNull().default(false),
+  archived: bool("archived").notNull().default(false),
   // JSON [{key,label}] — custom kanban stages; empty = default todo/doing/done
   kanbanColumns: text("kanban_columns").notNull().default(""),
   cover: text("cover").notNull().default(""),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
 });
 
-export const tags = pgTable("tags", {
+export const tags = sqliteTable("tags", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   color: text("color").notNull().default("#10b981"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
 });
 
 // ---------- Life OS: tasks ----------
 
-export const tasks = pgTable("tasks", {
+export const tasks = sqliteTable("tasks", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -119,21 +124,21 @@ export const tasks = pgTable("tasks", {
     .notNull()
     .default("todo"),
   priority: integer("priority").notNull().default(4), // 1 highest .. 4 none
-  dueDate: date("due_date"),
+  dueDate: text("due_date"),
   dueTime: text("due_time"), // HH:mm, optional
-  reminderAt: timestamp("reminder_at"),
-  completedAt: timestamp("completed_at"),
+  reminderAt: ts("reminder_at"),
+  completedAt: ts("completed_at"),
   // recurrence: null | JSON {freq: daily|weekly|monthly, interval, byWeekday?: number[], byMonthDay?: number}
   recurrence: text("recurrence"),
   sortOrder: integer("sort_order").notNull().default(0),
   kanbanColumn: text("kanban_column"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
+  updatedAt: tsNow("updated_at").notNull(),
 });
 
 // ---------- AI settings (keys server-side only, never sent to client) ----------
 
-export const aiSettings = pgTable("ai_settings", {
+export const aiSettings = sqliteTable("ai_settings", {
   userId: text("user_id")
     .primaryKey()
     .references(() => user.id, { onDelete: "cascade" }),
@@ -150,7 +155,7 @@ export const aiSettings = pgTable("ai_settings", {
 
 // ---------- Finance (standalone module; amounts in integer paise) ----------
 
-export const finAccounts = pgTable("fin_accounts", {
+export const finAccounts = sqliteTable("fin_accounts", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -161,11 +166,11 @@ export const finAccounts = pgTable("fin_accounts", {
     .default("bank"),
   openingBalanceMinor: integer("opening_balance_minor").notNull().default(0),
   color: text("color").notNull().default("#6366f1"),
-  archived: boolean("archived").notNull().default(false),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  archived: bool("archived").notNull().default(false),
+  createdAt: tsNow("created_at").notNull(),
 });
 
-export const finCategories = pgTable("fin_categories", {
+export const finCategories = sqliteTable("fin_categories", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -177,7 +182,7 @@ export const finCategories = pgTable("fin_categories", {
     .default("expense"),
 });
 
-export const finTransactions = pgTable("fin_transactions", {
+export const finTransactions = sqliteTable("fin_transactions", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -193,14 +198,14 @@ export const finTransactions = pgTable("fin_transactions", {
   amountMinor: integer("amount_minor").notNull(),
   originalAmount: text("original_amount"), // e.g. "25.00"
   originalCurrency: text("original_currency"), // e.g. "USD"
-  date: date("date").notNull(),
+  date: text("date").notNull(),
   note: text("note").notNull().default(""),
   transferToAccountId: text("transfer_to_account_id"),
   subscriptionId: text("subscription_id"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
 });
 
-export const finBudgets = pgTable("fin_budgets", {
+export const finBudgets = sqliteTable("fin_budgets", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -211,7 +216,7 @@ export const finBudgets = pgTable("fin_budgets", {
   monthlyLimitMinor: integer("monthly_limit_minor").notNull(),
 });
 
-export const finSubscriptions = pgTable("fin_subscriptions", {
+export const finSubscriptions = sqliteTable("fin_subscriptions", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -227,13 +232,13 @@ export const finSubscriptions = pgTable("fin_subscriptions", {
   cadence: text("cadence", { enum: ["weekly", "monthly", "yearly"] })
     .notNull()
     .default("monthly"),
-  nextDueDate: date("next_due_date").notNull(),
-  active: boolean("active").notNull().default(true),
-  autoLog: boolean("auto_log").notNull().default(true),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  nextDueDate: text("next_due_date").notNull(),
+  active: bool("active").notNull().default(true),
+  autoLog: bool("auto_log").notNull().default(true),
+  createdAt: tsNow("created_at").notNull(),
 });
 
-export const finSavingsGoals = pgTable("fin_savings_goals", {
+export const finSavingsGoals = sqliteTable("fin_savings_goals", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -241,11 +246,11 @@ export const finSavingsGoals = pgTable("fin_savings_goals", {
   name: text("name").notNull(),
   targetMinor: integer("target_minor").notNull(),
   savedMinor: integer("saved_minor").notNull().default(0),
-  deadline: date("deadline"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  deadline: text("deadline"),
+  createdAt: tsNow("created_at").notNull(),
 });
 
-export const finLent = pgTable("fin_lent", {
+export const finLent = sqliteTable("fin_lent", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -253,13 +258,13 @@ export const finLent = pgTable("fin_lent", {
   person: text("person").notNull(),
   direction: text("direction", { enum: ["lent", "borrowed"] }).notNull(),
   amountMinor: integer("amount_minor").notNull(),
-  date: date("date").notNull(),
+  date: text("date").notNull(),
   note: text("note").notNull().default(""),
-  settled: boolean("settled").notNull().default(false),
-  settledAt: timestamp("settled_at"),
+  settled: bool("settled").notNull().default(false),
+  settledAt: ts("settled_at"),
 });
 
-export const finRules = pgTable("fin_rules", {
+export const finRules = sqliteTable("fin_rules", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -273,7 +278,7 @@ export const finRules = pgTable("fin_rules", {
 
 // ---------- Vault (ciphertext only — server never sees plaintext) ----------
 
-export const vaultMeta = pgTable("vault_meta", {
+export const vaultMeta = sqliteTable("vault_meta", {
   userId: text("user_id")
     .primaryKey()
     .references(() => user.id, { onDelete: "cascade" }),
@@ -282,10 +287,10 @@ export const vaultMeta = pgTable("vault_meta", {
   // AES-GCM({iv, ct}) of a known constant, proves a candidate key is correct
   keyCheck: text("key_check").notNull(),
   iterations: integer("iterations").notNull().default(600000),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
 });
 
-export const vaultItems = pgTable("vault_items", {
+export const vaultItems = sqliteTable("vault_items", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -294,13 +299,13 @@ export const vaultItems = pgTable("vault_items", {
   type: text("type", { enum: ["login", "apikey", "note", "pem"] }).notNull(),
   // JSON {iv, ct} — AES-256-GCM encrypted item payload
   data: text("data").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
+  updatedAt: tsNow("updated_at").notNull(),
 });
 
 // ---------- Habits ----------
 
-export const habits = pgTable("habits", {
+export const habits = sqliteTable("habits", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -310,39 +315,39 @@ export const habits = pgTable("habits", {
   color: text("color").notNull().default("#10b981"),
   // weekdays the habit applies to, 0=Sun..6=Sat; empty = every day
   weekdays: text("weekdays").notNull().default("[]"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
 });
 
-export const habitChecks = pgTable(
+export const habitChecks = sqliteTable(
   "habit_checks",
   {
     habitId: text("habit_id")
       .notNull()
       .references(() => habits.id, { onDelete: "cascade" }),
-    date: date("date").notNull(),
+    date: text("date").notNull(),
   },
   (t) => [primaryKey({ columns: [t.habitId, t.date] })]
 );
 
 // ---------- Goals ----------
 
-export const goals = pgTable("goals", {
+export const goals = sqliteTable("goals", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
   description: text("description").notNull().default(""),
-  targetDate: date("target_date"),
+  targetDate: text("target_date"),
   // manual progress 0-100; if linked tasks exist, progress derives from them
   manualProgress: integer("manual_progress").notNull().default(0),
   status: text("status", { enum: ["active", "achieved", "dropped"] })
     .notNull()
     .default("active"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
 });
 
-export const goalTaskLinks = pgTable(
+export const goalTaskLinks = sqliteTable(
   "goal_task_links",
   {
     goalId: text("goal_id")
@@ -357,7 +362,7 @@ export const goalTaskLinks = pgTable(
 
 // ---------- Dashboard preferences ----------
 
-export const dashboardPrefs = pgTable("dashboard_prefs", {
+export const dashboardPrefs = sqliteTable("dashboard_prefs", {
   userId: text("user_id")
     .primaryKey()
     .references(() => user.id, { onDelete: "cascade" }),
@@ -367,23 +372,23 @@ export const dashboardPrefs = pgTable("dashboard_prefs", {
 
 // ---------- Events / countdowns ----------
 
-export const events = pgTable("events", {
+export const events = sqliteTable("events", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   title: text("title").notNull(),
-  date: date("date").notNull(),
-  yearlyRecurring: boolean("yearly_recurring").notNull().default(false),
+  date: text("date").notNull(),
+  yearlyRecurring: bool("yearly_recurring").notNull().default(false),
   color: text("color").notNull().default("#f59e0b"),
   icon: text("icon").notNull().default("🎉"),
   note: text("note").notNull().default(""),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
 });
 
 // ---------- Spreadsheets ----------
 
-export const sheets = pgTable("sheets", {
+export const sheets = sqliteTable("sheets", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -391,13 +396,13 @@ export const sheets = pgTable("sheets", {
   name: text("name").notNull().default("Untitled sheet"),
   // Univer IWorkbookData snapshot JSON
   data: text("data").notNull().default(""),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
+  updatedAt: tsNow("updated_at").notNull(),
 });
 
 // ---------- Notes ----------
 
-export const notes = pgTable("notes", {
+export const notes = sqliteTable("notes", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -415,11 +420,11 @@ export const notes = pgTable("notes", {
     .notNull()
     .default("page"),
   sortOrder: integer("sort_order").notNull().default(0),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
+  updatedAt: tsNow("updated_at").notNull(),
 });
 
-export const noteTaskLinks = pgTable(
+export const noteTaskLinks = sqliteTable(
   "note_task_links",
   {
     noteId: text("note_id")
@@ -432,7 +437,7 @@ export const noteTaskLinks = pgTable(
   (t) => [primaryKey({ columns: [t.noteId, t.taskId] })]
 );
 
-export const githubAuth = pgTable("github_auth", {
+export const githubAuth = sqliteTable("github_auth", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -442,10 +447,10 @@ export const githubAuth = pgTable("github_auth", {
   username: text("username").notNull(),
   name: text("name").notNull().default(""),
   emails: text("emails").notNull().default(""),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: tsNow("created_at").notNull(),
 });
 
-export const repoMappings = pgTable("repo_mappings", {
+export const repoMappings = sqliteTable("repo_mappings", {
   id: text("id").primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -456,10 +461,10 @@ export const repoMappings = pgTable("repo_mappings", {
   taskId: integer("task_id").notNull(),
   taskName: text("task_name").notNull(),
   count: integer("count").notNull().default(1),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  updatedAt: tsNow("updated_at").notNull(),
 });
 
-export const taskTags = pgTable(
+export const taskTags = sqliteTable(
   "task_tags",
   {
     taskId: text("task_id")

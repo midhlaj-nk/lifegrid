@@ -7,7 +7,7 @@ import {
 } from "ai";
 import { z } from "zod";
 import { endOfMonth, format } from "date-fns";
-import { and, asc, desc, eq, gte, ilike, lte, ne } from "drizzle-orm";
+import { and, asc, desc, eq, gte, like, lte, ne } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { db } from "@/db";
 import {
@@ -89,7 +89,7 @@ function buildTools(userId: string) {
         const rows = await db
           .select({ id: notes.id, title: notes.title, content: notes.content })
           .from(notes)
-          .where(and(eq(notes.userId, userId), ilike(notes.title, `%${query}%`)))
+          .where(and(eq(notes.userId, userId), like(notes.title, `%${query}%`)))
           .limit(10);
         return rows.map((r) => ({
           id: r.id,

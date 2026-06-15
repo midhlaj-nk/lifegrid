@@ -1,14 +1,18 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { drizzle } from "drizzle-orm/libsql";
+import { createClient } from "@libsql/client";
 import * as schema from "./schema";
 
 const globalForDb = globalThis as unknown as {
-  pgClient?: ReturnType<typeof postgres>;
+  libsqlClient?: ReturnType<typeof createClient>;
 };
 
 const client =
-  globalForDb.pgClient ?? postgres(process.env.DATABASE_URL!, { max: 10 });
+  globalForDb.libsqlClient ??
+  createClient({
+    url: process.env.DATABASE_URL!,
+    authToken: process.env.DATABASE_AUTH_TOKEN,
+  });
 
-if (process.env.NODE_ENV !== "production") globalForDb.pgClient = client;
+if (process.env.NODE_ENV !== "production") globalForDb.libsqlClient = client;
 
 export const db = drizzle(client, { schema });
