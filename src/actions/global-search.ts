@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { notes, sheets, tasks } from "@/db/schema";
 import { requireUser } from "@/lib/session";
 import { getTaskById } from "@/lib/queries";
-import { and, eq, like } from "drizzle-orm";
+import { and, eq, like, or } from "drizzle-orm";
 
 export type SearchResult = {
   id: string;
@@ -29,13 +29,23 @@ export async function globalSearch(query: string): Promise<SearchResult[]> {
     db
       .select({ id: tasks.id, title: tasks.title })
       .from(tasks)
-      .where(and(eq(tasks.userId, user.id), like(tasks.title, q)))
+      .where(
+        and(
+          eq(tasks.userId, user.id),
+          or(like(tasks.title, q), like(tasks.note, q))
+        )
+      )
       .limit(5),
     db
       .select({ id: notes.id, title: notes.title, icon: notes.icon })
       .from(notes)
-      .where(and(eq(notes.userId, user.id), like(notes.title, q)))
-      .limit(5),
+      .where(
+        and(
+          eq(notes.userId, user.id),
+          or(like(notes.title, q), like(notes.content, q))
+        )
+      )
+      .limit(8),
     db
       .select({ id: sheets.id, title: sheets.name })
       .from(sheets)
