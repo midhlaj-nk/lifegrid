@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { setAllowSignups } from "@/actions/admin";
 
@@ -11,7 +12,14 @@ export function AdminSettings({ allowSignups }: { allowSignups: boolean }) {
   function toggle() {
     const next = !on;
     setOn(next);
-    startTransition(() => setAllowSignups(next));
+    startTransition(async () => {
+      try {
+        await setAllowSignups(next);
+      } catch (e) {
+        setOn(!next); // revert
+        toast.error((e as Error).message ?? "Failed to update setting");
+      }
+    });
   }
 
   return (
