@@ -105,7 +105,7 @@ export function SheetEditor({
   // True fullscreen: fixed overlay escaping the app shell (sidebar, header,
   // padding, bottom nav). Univer needs the whole viewport to be usable.
   return (
-    <div className="fixed top-0 left-0 right-0 bottom-0 z-50 flex flex-col bg-background">
+    <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999 }} className="flex flex-col bg-background">
       <div className="flex items-center gap-2 border-b border-border px-3 py-2">
         <Link
           href="/sheets"
