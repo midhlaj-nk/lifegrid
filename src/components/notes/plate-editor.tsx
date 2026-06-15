@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BlockNoteEditor } from "@blocknote/core";
-import { BlockNoteView, useCreateBlockNote } from "@blocknote/react";
+import { BlockNoteViewRaw, useCreateBlockNote } from "@blocknote/react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/react/style.css";
 import { ArrowLeft } from "lucide-react";
@@ -18,7 +18,7 @@ export function PlateEditor({
   initialContent?: string;
 }) {
   const [saveState, setSaveState] = useState<"saved" | "saving" | "dirty">("saved");
-  const saveTimer = useRef<ReturnType<typeof setTimeout>>();
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSaved = useRef<string>("");
 
   const editor = useCreateBlockNote({
@@ -37,7 +37,7 @@ export function PlateEditor({
           setSaveState("saved");
           return;
         }
-        await updateNote(noteId, content);
+        await updateNote(noteId, { content });
         lastSaved.current = content;
         setSaveState("saved");
       } catch {
@@ -70,7 +70,7 @@ export function PlateEditor({
         </span>
       </div>
       <div className="flex-1 overflow-auto">
-        <BlockNoteView
+        <BlockNoteViewRaw
           editor={editor}
           onChange={handleChange}
           theme="dark"
