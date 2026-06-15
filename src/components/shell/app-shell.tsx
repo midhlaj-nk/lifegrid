@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, Moon, PanelLeft, Settings, Sun, X } from "lucide-react";
+import { LayoutGrid, Moon, PanelLeft, Search, Settings, Sun, X } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { LogoMark } from "@/components/brand/logo";
 import { Sidebar } from "./sidebar";
 import { MobileBottomNav } from "./mobile-nav";
 import { PageTransition } from "./page-transition";
 import { TaskPaneProvider } from "@/components/tasks/task-pane";
+import { CommandPalette } from "./command-palette";
 import { cn } from "@/lib/utils";
 
 interface AppShellProps {
@@ -126,10 +127,24 @@ export function AppShell({ areas, projects, tags, userName, children }: AppShell
           <div className="ml-auto flex items-center gap-1 md:hidden">
             <ThemeToggle />
           </div>
-          <span className="ml-auto hidden text-xs text-muted-foreground md:block">
+          <button
+            onClick={() => {
+              document.dispatchEvent(
+                new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true })
+              );
+            }}
+            className="ml-auto hidden items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground hover:bg-accent md:flex"
+            aria-label="Open command palette"
+          >
+            <Search className="h-3 w-3" />
+            Search
+            <kbd className="ml-1 rounded bg-muted px-1 py-0.5 text-[10px]">⌘K</kbd>
+          </button>
+          <span className="ml-2 hidden text-xs text-muted-foreground md:block">
             {userName}
           </span>
         </header>
+        <CommandPalette />
         <main className="pb-safe-nav flex-1 px-3 pt-4 md:px-8 md:pb-8">
           <PageTransition className={cn("mx-auto w-full", fullWidth ? "max-w-none" : "max-w-3xl")}>
             <TaskPaneProvider tags={tags} projects={projects} areas={areas}>
