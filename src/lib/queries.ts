@@ -66,6 +66,47 @@ async function attachMeta(
   }));
 }
 
+/** Fetch one task fully hydrated (tags, subtasks, project meta). */
+export async function getTaskById(
+  userId: string,
+  id: string
+): Promise<TaskWithMeta | null> {
+  const [row] = await db
+    .select()
+    .from(tasks)
+    .where(and(eq(tasks.id, id), eq(tasks.userId, userId)));
+  if (!row) return null;
+  const [tagLinks, subs] = await Promise.all([
+    db
+      .select({ tag: tags })
+      .from(taskTags)
+      .innerJoin(tags, eq(taskTags.tagId, tags.id))
+      .where(eq(taskTags.taskId, id)),
+    db
+      .select()
+      .from(tasks)
+      .where(and(eq(tasks.userId, userId), eq(tasks.parentId, id)))
+      .orderBy(asc(tasks.sortOrder), asc(tasks.createdAt)),
+  ]);
+  let projectName: string | null = null;
+  let projectColor: string | null = null;
+  if (row.projectId) {
+    const [p] = await db
+      .select()
+      .from(projects)
+      .where(eq(projects.id, row.projectId));
+    projectName = p?.name ?? null;
+    projectColor = p?.color ?? null;
+  }
+  return {
+    ...row,
+    tags: tagLinks.map((l) => l.tag),
+    subtasks: subs,
+    projectName,
+    projectColor,
+  };
+}
+
 export async function getAllOpenTasks(userId: string) {
   const rows = await db
     .select()

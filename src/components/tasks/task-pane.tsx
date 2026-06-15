@@ -18,6 +18,7 @@ import {
   toggleTaskDone,
   createTask,
 } from "@/actions/tasks";
+import { createTag } from "@/actions/organize";
 import {
   parseRecurrence,
   type Recurrence,
@@ -26,6 +27,8 @@ import { cn } from "@/lib/utils";
 import type { TaskWithMeta, TaskRow } from "@/lib/queries";
 
 type TagItem = { id: string; name: string; color: string };
+type ProjectItem = { id: string; name: string; color: string; areaId: string | null };
+type AreaItem = { id: string; name: string; color: string };
 
 const RECURRENCE_PRESETS: { label: string; value: Recurrence | null }[] = [
   { label: "No repeat", value: null },
@@ -46,9 +49,13 @@ export function useTaskPane() {
 
 export function TaskPaneProvider({
   tags,
+  projects,
+  areas,
   children,
 }: {
   tags: TagItem[];
+  projects: ProjectItem[];
+  areas: AreaItem[];
   children: React.ReactNode;
 }) {
   const [task, setTask] = useState<TaskWithMeta | null>(null);
@@ -69,6 +76,8 @@ export function TaskPaneProvider({
             key={task.id}
             task={task}
             tags={tags}
+            projects={projects}
+            areas={areas}
             onClose={() => setTask(null)}
           />
         )}
@@ -80,10 +89,14 @@ export function TaskPaneProvider({
 function TaskDetail({
   task,
   tags,
+  projects,
+  areas,
   onClose,
 }: {
   task: TaskWithMeta;
   tags: TagItem[];
+  projects: ProjectItem[];
+  areas: AreaItem[];
   onClose: () => void;
 }) {
   const router = useRouter();
@@ -95,7 +108,10 @@ function TaskDetail({
   const [dueDate, setDueDate] = useState(task.dueDate ?? "");
   const [dueTime, setDueTime] = useState(task.dueTime ?? "");
   const [priority, setPriority] = useState(task.priority);
+  const [projectId, setProjectId] = useState(task.projectId ?? "");
+  const [areaId, setAreaId] = useState(task.areaId ?? "");
   const [tagIds, setTagIds] = useState<string[]>(task.tags.map((t) => t.id));
+  const [newTag, setNewTag] = useState("");
   const [subtasks, setSubtasks] = useState<TaskRow[]>(task.subtasks);
   const [newSubtask, setNewSubtask] = useState("");
   const [done, setDone] = useState(task.status === "done");
@@ -120,13 +136,26 @@ function TaskDetail({
         dueDate: dueDate || null,
         dueTime: dueTime || null,
         priority,
+        projectId: projectId || null,
+        areaId: areaId || null,
         recurrence: rec ? JSON.stringify(rec) : null,
         tagIds,
       }).then(() => router.refresh());
     }, 600);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, note, dueDate, dueTime, priority, recIdx, tagIds]);
+  }, [title, note, dueDate, dueTime, priority, projectId, areaId, recIdx, tagIds]);
+
+  function addNewTag() {
+    const v = newTag.trim();
+    if (!v) return;
+    setNewTag("");
+    startTransition(async () => {
+      const id = await createTag({ name: v });
+      setTagIds((cur) => [...cur, id]);
+      router.refresh();
+    });
+  }
 
   function toggleTag(id: string) {
     setTagIds((cur) =>
@@ -229,6 +258,36 @@ function TaskDetail({
           />
         </Field>
 
+        <Field label="Project">
+          <select
+            value={projectId}
+            onChange={(e) => setProjectId(e.target.value)}
+            className="h-8 rounded-md border border-input bg-background px-2 outline-none"
+          >
+            <option value="">None</option>
+            {projects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label="Area">
+          <select
+            value={areaId}
+            onChange={(e) => setAreaId(e.target.value)}
+            className="h-8 rounded-md border border-input bg-background px-2 outline-none"
+          >
+            <option value="">None</option>
+            {areas.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.name}
+              </option>
+            ))}
+          </select>
+        </Field>
+
         <Field label="Priority">
           <select
             value={priority}
@@ -267,30 +326,40 @@ function TaskDetail({
           </select>
         </Field>
 
-        {tags.length > 0 && (
-          <Field label="Tags">
-            <div className="flex flex-wrap gap-1.5">
-              {tags.map((t) => {
-                const on = tagIds.includes(t.id);
-                return (
-                  <button
-                    key={t.id}
-                    onClick={() => toggleTag(t.id)}
-                    className={cn(
-                      "rounded-full border px-2 py-0.5 text-xs transition-colors",
-                      on
-                        ? "border-transparent text-white"
-                        : "border-border text-muted-foreground hover:bg-accent"
-                    )}
-                    style={on ? { backgroundColor: t.color } : undefined}
-                  >
-                    #{t.name}
-                  </button>
-                );
-              })}
-            </div>
-          </Field>
-        )}
+        <Field label="Tags">
+          <div className="flex flex-wrap items-center gap-1.5">
+            {tags.map((t) => {
+              const on = tagIds.includes(t.id);
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => toggleTag(t.id)}
+                  className={cn(
+                    "rounded-full border px-2 py-0.5 text-xs transition-colors",
+                    on
+                      ? "border-transparent text-white"
+                      : "border-border text-muted-foreground hover:bg-accent"
+                  )}
+                  style={on ? { backgroundColor: t.color } : undefined}
+                >
+                  #{t.name}
+                </button>
+              );
+            })}
+            <input
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addNewTag();
+                }
+              }}
+              placeholder="+ tag"
+              className="h-6 w-16 rounded-full border border-dashed border-border bg-transparent px-2 text-xs outline-none focus:w-24"
+            />
+          </div>
+        </Field>
       </div>
 
       {/* description */}

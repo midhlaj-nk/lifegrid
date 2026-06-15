@@ -13,6 +13,15 @@ const tsNow = (name: string) =>
   integer(name, { mode: "timestamp" }).default(sql`(unixepoch())`);
 const bool = (name: string) => integer(name, { mode: "boolean" });
 
+// ---------- App-wide config (singleton row id="singleton") ----------
+
+export const appConfig = sqliteTable("app_config", {
+  id: text("id").primaryKey().default("singleton"),
+  // new account registration — off by default; only the super admin re-enables
+  allowSignups: bool("allow_signups").notNull().default(false),
+  updatedAt: tsNow("updated_at").notNull(),
+});
+
 // ---------- Better Auth tables ----------
 
 export const user = sqliteTable("user", {

@@ -2,16 +2,23 @@ import { requireUser } from "@/lib/session";
 import { getAiSettingsSafe } from "@/actions/ai-settings";
 import { getVaultMeta } from "@/actions/vault";
 import { getTags } from "@/actions/organize";
+import { getAppConfig } from "@/actions/admin";
 import { ProfileForm, SignOutButton, SessionsManager } from "./settings-client";
 import { AiSettingsForm } from "./ai-settings-form";
 import { AppearanceForm } from "./appearance-form";
 import { TagsSettings } from "./tags-settings";
 import { VaultResetForm } from "./vault-reset-form";
+import { AdminSettings } from "./admin-settings";
 import { SettingsShell } from "./settings-shell";
 
 export default async function SettingsPage() {
   const user = await requireUser();
-  const [ai, vaultMeta, tagRows] = await Promise.all([getAiSettingsSafe(), getVaultMeta(), getTags()]);
+  const [ai, vaultMeta, tagRows, config] = await Promise.all([
+    getAiSettingsSafe(),
+    getVaultMeta(),
+    getTags(),
+    getAppConfig(),
+  ]);
 
   const sections = {
     account: (
@@ -74,6 +81,17 @@ export default async function SettingsPage() {
         </p>
         <div className="rounded-xl border border-border p-5">
           <VaultResetForm hasVault={!!vaultMeta} />
+        </div>
+      </div>
+    ),
+    admin: (
+      <div>
+        <h2 className="mb-1 text-base font-semibold">Admin</h2>
+        <p className="mb-6 text-xs text-muted-foreground">
+          Super-admin controls for this workspace.
+        </p>
+        <div className="rounded-xl border border-border p-5">
+          <AdminSettings allowSignups={config.allowSignups} />
         </div>
       </div>
     ),

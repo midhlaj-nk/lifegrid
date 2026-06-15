@@ -132,7 +132,9 @@ export function AppShell({ areas, projects, tags, userName, children }: AppShell
         </header>
         <main className="pb-safe-nav flex-1 px-3 pt-4 md:px-8 md:pb-8">
           <PageTransition className={cn("mx-auto w-full", fullWidth ? "max-w-none" : "max-w-3xl")}>
-            <TaskPaneProvider tags={tags}>{children}</TaskPaneProvider>
+            <TaskPaneProvider tags={tags} projects={projects} areas={areas}>
+              {children}
+            </TaskPaneProvider>
           </PageTransition>
         </main>
       </div>

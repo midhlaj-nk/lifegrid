@@ -3,7 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
-import { count } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -21,15 +21,22 @@ export const auth = betterAuth({
   databaseHooks: {
     user: {
       create: {
-        // Closed signup: only the first account may register.
+        // The first account always bootstraps (super admin). After that,
+        // signups are closed unless the admin re-enables them in Settings.
         before: async (newUser) => {
           const [{ value }] = await db
             .select({ value: count() })
             .from(schema.user);
           if (value > 0) {
-            throw new APIError("FORBIDDEN", {
-              message: "Registration is closed.",
-            });
+            const [cfg] = await db
+              .select({ allow: schema.appConfig.allowSignups })
+              .from(schema.appConfig)
+              .where(eq(schema.appConfig.id, "singleton"));
+            if (!cfg?.allow) {
+              throw new APIError("FORBIDDEN", {
+                message: "Registration is closed.",
+              });
+            }
           }
           return { data: newUser };
         },
