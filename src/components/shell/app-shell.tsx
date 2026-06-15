@@ -9,6 +9,7 @@ import { LogoMark } from "@/components/brand/logo";
 import { Sidebar } from "./sidebar";
 import { MobileBottomNav } from "./mobile-nav";
 import { PageTransition } from "./page-transition";
+import { TaskPaneProvider } from "@/components/tasks/task-pane";
 import { cn } from "@/lib/utils";
 
 interface AppShellProps {
@@ -131,7 +132,7 @@ export function AppShell({ areas, projects, tags, userName, children }: AppShell
         </header>
         <main className="pb-safe-nav flex-1 px-3 pt-4 md:px-8 md:pb-8">
           <PageTransition className={cn("mx-auto w-full", fullWidth ? "max-w-none" : "max-w-3xl")}>
-            {children}
+            <TaskPaneProvider tags={tags}>{children}</TaskPaneProvider>
           </PageTransition>
         </main>
       </div>

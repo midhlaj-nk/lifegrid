@@ -16,6 +16,8 @@ const PlateEditor = dynamic(
 export function NoteEditorShell(props: {
   noteId: string;
   initialContent: string;
+  tasks?: { id: string; title: string }[];
+  notes?: { id: string; title: string; icon?: string }[];
 }) {
   return <PlateEditor {...props} />;
 }

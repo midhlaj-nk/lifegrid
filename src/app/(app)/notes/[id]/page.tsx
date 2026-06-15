@@ -110,7 +110,16 @@ export default async function NotePage({
           initialCanvas={note.canvas}
         />
       ) : (
-        <NoteEditorShell noteId={note.id} initialContent={note.content} />
+        <NoteEditorShell
+          noteId={note.id}
+          initialContent={note.content}
+          tasks={openTasks
+            .filter((t) => t.status !== "done")
+            .map((t) => ({ id: t.id, title: t.title }))}
+          notes={allNotes
+            .filter((n) => n.id !== note.id)
+            .map((n) => ({ id: n.id, title: n.title, icon: n.icon }))}
+        />
       )}
 
       {children.length > 0 && (

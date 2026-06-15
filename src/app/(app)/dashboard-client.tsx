@@ -22,6 +22,7 @@ import { Check, GripVertical, Pencil } from "lucide-react";
 import { WeatherChip } from "@/components/dashboard/weather-chip";
 import { NewsWidget } from "@/components/dashboard/news-widget";
 import { toggleTaskDone } from "@/actions/tasks";
+import { useTaskPane } from "@/components/tasks/task-pane";
 import { toggleHabitCheck } from "@/actions/habits";
 import { saveDashboardPrefs } from "@/actions/dashboard";
 import { countdownLabel } from "@/lib/events";
@@ -300,6 +301,7 @@ function Card({
 
 function TaskRow({ task }: { task: TaskWithMeta }) {
   const [pending, startTransition] = useTransition();
+  const openTask = useTaskPane();
   return (
     <div className={cn("flex items-center gap-2 py-1", pending && "opacity-50")}>
       <button
@@ -307,7 +309,12 @@ function TaskRow({ task }: { task: TaskWithMeta }) {
         className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 border-muted-foreground/40 hover:border-primary"
         aria-label="Complete task"
       />
-      <span className="flex-1 truncate text-sm">{task.title}</span>
+      <button
+        onClick={() => openTask(task)}
+        className="flex-1 truncate text-left text-sm hover:underline"
+      >
+        {task.title}
+      </button>
       {task.dueDate && (
         <span className="text-[11px] text-muted-foreground">
           {format(parseISO(task.dueDate), "d MMM")}

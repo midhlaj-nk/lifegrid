@@ -16,15 +16,14 @@ import { cn } from "@/lib/utils";
 import {
   toggleTaskDone,
   deleteTask,
-  updateTask,
   createTask,
 } from "@/actions/tasks";
 import {
   parseRecurrence,
   describeRecurrence,
-  type Recurrence,
 } from "@/lib/recurrence";
-import { useConfirm, AppModal } from "@/components/ui/app-dialog";
+import { useConfirm } from "@/components/ui/app-dialog";
+import { useTaskPane } from "@/components/tasks/task-pane";
 import type { TaskWithMeta } from "@/lib/queries";
 
 const PRIORITY_COLOR: Record<number, string> = {
@@ -33,23 +32,15 @@ const PRIORITY_COLOR: Record<number, string> = {
   3: "text-blue-500",
 };
 
-const RECURRENCE_PRESETS: { label: string; value: Recurrence | null }[] = [
-  { label: "No repeat", value: null },
-  { label: "Daily", value: { freq: "daily", interval: 1 } },
-  { label: "Weekly", value: { freq: "weekly", interval: 1 } },
-  { label: "Weekdays", value: { freq: "weekly", interval: 1, byWeekday: [1, 2, 3, 4, 5] } },
-  { label: "Monthly", value: { freq: "monthly", interval: 1 } },
-];
-
 export function TaskItem({ task }: { task: TaskWithMeta }) {
   const [pending, startTransition] = useTransition();
   const [expanded, setExpanded] = useState(false);
-  const [editing, setEditing] = useState(false);
   const [addingSubtask, setAddingSubtask] = useState(false);
   const [subtaskTitle, setSubtaskTitle] = useState("");
   // optimistic done state — flips instantly, server catches up
   const [optimisticDone, setOptimisticDone] = useState<boolean | null>(null);
   const confirm = useConfirm();
+  const openTask = useTaskPane();
 
   const done = optimisticDone ?? task.status === "done";
   const rec = parseRecurrence(task.recurrence);
@@ -109,7 +100,7 @@ export function TaskItem({ task }: { task: TaskWithMeta }) {
               </button>
             )}
             <button
-              onClick={() => setEditing(true)}
+              onClick={() => openTask(task)}
               className={cn(
                 "truncate text-left text-sm hover:underline",
                 done && "text-muted-foreground line-through"
@@ -178,7 +169,7 @@ export function TaskItem({ task }: { task: TaskWithMeta }) {
             <Plus className="h-3.5 w-3.5" />
           </button>
           <button
-            onClick={() => setEditing(true)}
+            onClick={() => openTask(task)}
             aria-label="Edit task"
             className="text-muted-foreground hover:text-foreground"
           >
@@ -235,119 +226,7 @@ export function TaskItem({ task }: { task: TaskWithMeta }) {
         </div>
       )}
 
-      {editing && <EditTaskDialog task={task} onClose={() => setEditing(false)} />}
     </div>
-  );
-}
-
-function EditTaskDialog({
-  task,
-  onClose,
-}: {
-  task: TaskWithMeta;
-  onClose: () => void;
-}) {
-  const [title, setTitle] = useState(task.title);
-  const [note, setNote] = useState(task.note);
-  const [dueDate, setDueDate] = useState(task.dueDate ?? "");
-  const [dueTime, setDueTime] = useState(task.dueTime ?? "");
-  const [priority, setPriority] = useState(task.priority);
-  const initialRec = parseRecurrence(task.recurrence);
-  const [recIdx, setRecIdx] = useState(() => {
-    if (!initialRec) return 0;
-    const idx = RECURRENCE_PRESETS.findIndex(
-      (p) => JSON.stringify(p.value) === JSON.stringify(initialRec)
-    );
-    return idx === -1 ? 0 : idx;
-  });
-  const [pending, startTransition] = useTransition();
-
-  return (
-    <AppModal open onClose={onClose} title="Edit task" wide>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!title.trim()) return;
-          const rec = RECURRENCE_PRESETS[recIdx].value;
-          startTransition(async () => {
-            await updateTask(task.id, {
-              title: title.trim(),
-              note,
-              dueDate: dueDate || null,
-              dueTime: dueTime || null,
-              priority,
-              recurrence: rec ? JSON.stringify(rec) : null,
-            });
-            onClose();
-          });
-        }}
-        className="space-y-3"
-      >
-        <input
-          autoFocus
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        />
-        <textarea
-          value={note}
-          onChange={(e) => setNote(e.target.value)}
-          placeholder="Notes…"
-          rows={3}
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm outline-none"
-        />
-        <div className="flex flex-wrap items-center gap-2">
-          <input
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm outline-none"
-          />
-          <input
-            type="time"
-            value={dueTime}
-            onChange={(e) => setDueTime(e.target.value)}
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm outline-none"
-          />
-          <select
-            value={priority}
-            onChange={(e) => setPriority(Number(e.target.value))}
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm outline-none"
-          >
-            <option value={1}>P1 — urgent</option>
-            <option value={2}>P2 — high</option>
-            <option value={3}>P3 — medium</option>
-            <option value={4}>No priority</option>
-          </select>
-          <select
-            value={recIdx}
-            onChange={(e) => setRecIdx(Number(e.target.value))}
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm outline-none"
-          >
-            {RECURRENCE_PRESETS.map((r, i) => (
-              <option key={r.label} value={i}>
-                {r.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex justify-end gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="h-9 rounded-md border border-border px-4 text-sm hover:bg-accent"
-          >
-            Cancel
-          </button>
-          <button
-            disabled={pending || !title.trim()}
-            className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-50"
-          >
-            Save
-          </button>
-        </div>
-      </form>
-    </AppModal>
   );
 }
 
