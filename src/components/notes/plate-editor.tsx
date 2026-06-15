@@ -5,8 +5,6 @@ import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 import { toast } from "sonner";
 import { updateNote } from "@/actions/notes";
 
@@ -83,20 +81,15 @@ export function PlateEditor({
   if (!editor) return <div className="p-4">Loading editor...</div>;
 
   return (
-    <div className="h-full w-full flex flex-col bg-background">
-      <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <Link
-          href="/notes"
-          className="rounded-md p-1.5 text-muted-foreground hover:bg-accent"
-          aria-label="Back to notes"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </Link>
-        <span className="text-sm text-muted-foreground">
-          {saveState === "saving" ? "Saving..." : saveState === "saved" ? "Saved" : "Unsaved"}
+    <div className="w-full">
+      <div className="mb-1 flex items-center justify-end px-2">
+        <span className="text-xs text-muted-foreground">
+          {saveState === "saving" ? "Saving…" : saveState === "saved" ? "Saved" : "Unsaved"}
         </span>
       </div>
-      <div className="flex-1 overflow-auto relative">
+      {/* No height cap / overflow clip here: the editor grows with content and
+          the BlockNote slash menu + toolbars can overflow freely. */}
+      <div className="min-h-[55vh] -mx-3 md:-mx-12">
         {editor && (
           <BlockNoteView
             editor={editor}
