@@ -1,22 +1,119 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import {
   useCreateBlockNote,
   getDefaultReactSlashMenuItems,
   SuggestionMenuController,
+  createReactBlockSpec,
   type DefaultReactSuggestionItem,
 } from "@blocknote/react";
+import { BlockNoteSchema, defaultBlockSpecs } from "@blocknote/core";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import { CheckSquare, FileText, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { updateNote, linkNoteToTask } from "@/actions/notes";
+import { toggleTaskDone } from "@/actions/tasks";
 import { cn } from "@/lib/utils";
 
 type LinkTarget = { id: string; title: string; icon?: string };
+
+// --- Custom block: a linked task reference with interactive checkbox ---
+
+const TaskRefBlock = createReactBlockSpec(
+  {
+    type: "taskRef" as const,
+    propSchema: {
+      taskId: { default: "" },
+      title: { default: "Task" },
+      done: { default: false },
+    },
+    content: "none",
+  },
+  {
+    render: ({ block, editor }) => {
+      return (
+        <TaskRefInner
+          blockId={block.id}
+          taskId={block.props.taskId}
+          title={block.props.title}
+          initialDone={block.props.done}
+          onToggle={(done) => {
+            editor.updateBlock(block, { props: { ...block.props, done } });
+          }}
+        />
+      );
+    },
+  }
+);
+
+// Separate component so it can use hooks
+function TaskRefInner({
+  taskId,
+  title,
+  initialDone,
+  onToggle,
+}: {
+  blockId: string;
+  taskId: string;
+  title: string;
+  initialDone: boolean;
+  onToggle: (done: boolean) => void;
+}) {
+  const [done, setDone] = useState(initialDone);
+  const [pending, startTransition] = useTransition();
+
+  function toggle() {
+    const next = !done;
+    setDone(next);
+    onToggle(next);
+    startTransition(async () => {
+      await toggleTaskDone(taskId);
+    });
+  }
+
+  return (
+    <div
+      className="flex items-center gap-2 rounded-md border border-border/60 bg-muted/30 px-3 py-1.5 my-1"
+      contentEditable={false}
+    >
+      <button
+        onClick={toggle}
+        disabled={pending}
+        className={cn(
+          "flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 transition-colors",
+          done
+            ? "border-primary bg-primary text-primary-foreground"
+            : "border-muted-foreground/40 hover:border-primary"
+        )}
+        aria-label={done ? "Mark not done" : "Mark done"}
+      >
+        {done && (
+          <svg viewBox="0 0 12 12" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <polyline points="1,6 4.5,9.5 11,2" />
+          </svg>
+        )}
+      </button>
+      <span className={cn("flex-1 text-sm", done && "text-muted-foreground line-through")}>
+        {title}
+      </span>
+      <CheckSquare className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
+    </div>
+  );
+}
+
+const schema = BlockNoteSchema.create({
+  blockSpecs: {
+    ...defaultBlockSpecs,
+    // call the factory (createReactBlockSpec returns a factory fn, not a spec directly)
+    taskRef: TaskRefBlock(),
+  },
+});
+
+// -----------------------------------------------------------------------
 
 export function PlateEditor({
   noteId,
@@ -39,10 +136,6 @@ export function PlateEditor({
     if (!initialContent) return undefined;
     try {
       const parsed = JSON.parse(initialContent);
-      // Must be a non-empty array of well-formed BlockNote blocks
-      // (each block has a string `type` and `id`). Anything else —
-      // empty arrays, old Plate/markdown content, corrupted JSON —
-      // falls back to a fresh editor instead of crashing.
       if (
         Array.isArray(parsed) &&
         parsed.length > 0 &&
@@ -63,6 +156,7 @@ export function PlateEditor({
   })();
 
   const editor = useCreateBlockNote({
+    schema,
     ...(validatedContent ? { initialContent: validatedContent } : {}),
   });
 
@@ -94,7 +188,6 @@ export function PlateEditor({
     };
   }, []);
 
-  // Slash items: BlockNote defaults + our "Link task" / "Link note" entries.
   const getSlashItems = useCallback(
     async (query: string): Promise<DefaultReactSuggestionItem[]> => {
       if (!editor) return [];
@@ -138,11 +231,22 @@ export function PlateEditor({
         " ",
       ]);
     } else if (mode === "task") {
-      // visible inline mention + persist the note↔task link
-      editor.insertInlineContent([
-        { type: "text", text: `☑ ${target.title}`, styles: { bold: true } },
-        " ",
-      ]);
+      // Insert a live task-ref block (interactive checkbox)
+      const { block: current } = editor.getTextCursorPosition();
+      editor.insertBlocks(
+        [
+          {
+            type: "taskRef",
+            props: {
+              taskId: target.id,
+              title: target.title,
+              done: false,
+            },
+          },
+        ],
+        current,
+        "after"
+      );
       linkNoteToTask(noteId, target.id)
         .then(() => router.refresh())
         .catch(() => toast.error("Couldn't link task"));
@@ -159,8 +263,6 @@ export function PlateEditor({
           {saveState === "saving" ? "Saving…" : saveState === "saved" ? "Saved" : "Unsaved"}
         </span>
       </div>
-      {/* No height cap / overflow clip here: the editor grows with content and
-          the BlockNote slash menu + toolbars can overflow freely. */}
       <div className="min-h-[55vh] -mx-3 md:-mx-12">
         <BlockNoteView
           editor={editor}
