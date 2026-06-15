@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutGrid, Moon, PanelLeft, Search, Settings, Sun, X } from "lucide-react";
+import { LayoutGrid, Moon, PanelLeft, Search, Settings, Sun, Zap, X } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { LogoMark } from "@/components/brand/logo";
 import { Sidebar } from "./sidebar";
@@ -127,19 +127,34 @@ export function AppShell({ areas, projects, tags, userName, children }: AppShell
           <div className="ml-auto flex items-center gap-1 md:hidden">
             <ThemeToggle />
           </div>
-          <button
-            onClick={() => {
-              document.dispatchEvent(
-                new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true })
-              );
-            }}
-            className="ml-auto hidden items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground hover:bg-accent md:flex"
-            aria-label="Open command palette"
-          >
-            <Search className="h-3 w-3" />
-            Search
-            <kbd className="ml-1 rounded bg-muted px-1 py-0.5 text-[10px]">⌘K</kbd>
-          </button>
+          <div className="ml-auto hidden items-center gap-2 md:flex">
+            <button
+              onClick={() => {
+                document.dispatchEvent(
+                  new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true })
+                );
+              }}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground hover:bg-accent"
+              aria-label="Open command palette"
+            >
+              <Search className="h-3 w-3" />
+              Search
+              <kbd className="ml-1 rounded bg-muted px-1 py-0.5 text-[10px]">⌘K</kbd>
+            </button>
+            <button
+              onClick={() => {
+                document.dispatchEvent(
+                  new KeyboardEvent("keydown", { key: "q", bubbles: true })
+                );
+              }}
+              className="inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground hover:bg-accent"
+              aria-label="Quick add task"
+            >
+              <Zap className="h-3 w-3 text-amber-500" />
+              Quick add
+              <kbd className="ml-1 rounded bg-muted px-1 py-0.5 text-[10px]">Q</kbd>
+            </button>
+          </div>
           <span className="ml-2 hidden text-xs text-muted-foreground md:block">
             {userName}
           </span>

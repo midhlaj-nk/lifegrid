@@ -18,7 +18,15 @@ export function GlobalQuickAdd() {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+      // q / Q — quick add (when not typing in an input/textarea/contenteditable)
+      if (
+        (e.key === "q" || e.key === "Q") &&
+        !e.metaKey &&
+        !e.ctrlKey &&
+        !(e.target instanceof HTMLInputElement) &&
+        !(e.target instanceof HTMLTextAreaElement) &&
+        !(e.target instanceof HTMLElement && e.target.isContentEditable)
+      ) {
         e.preventDefault();
         setOpen((v) => !v);
       }
@@ -110,7 +118,7 @@ export function GlobalQuickAdd() {
 
           <div className="mt-3 flex items-center justify-between">
             <span className="text-[11px] text-muted-foreground">
-              Ctrl/⌘+K to toggle · Enter to add
+              Q to toggle · Enter to add
             </span>
             <div className="flex gap-2">
               <button
