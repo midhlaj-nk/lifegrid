@@ -24,16 +24,21 @@ export function PlateEditor({
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastSaved = useRef<string>("");
 
-  const editor = useCreateBlockNote({
-    initialContent: (() => {
-      if (!initialContent) return undefined;
-      try {
-        const parsed = JSON.parse(initialContent);
-        return Array.isArray(parsed) && parsed.length > 0 ? parsed : undefined;
-      } catch {
-        return undefined;
+  const validatedContent = (() => {
+    if (!initialContent) return undefined;
+    try {
+      const parsed = JSON.parse(initialContent);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
       }
-    })(),
+      return undefined;
+    } catch {
+      return undefined;
+    }
+  })();
+
+  const editor = useCreateBlockNote({
+    ...(validatedContent ? { initialContent: validatedContent } : {}),
   });
 
   const handleChange = useCallback(() => {
