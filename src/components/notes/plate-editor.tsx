@@ -1,13 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { BlockNoteEditor } from "@blocknote/core";
-import {
-  BlockNoteViewRaw,
-  useCreateBlockNote,
-} from "@blocknote/react";
+import { useCreateBlockNote } from "@blocknote/react";
+import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/core/fonts/inter.css";
-import "@blocknote/react/style.css";
+import "@blocknote/mantine/style.css";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -101,7 +98,7 @@ export function PlateEditor({
       </div>
       <div className="flex-1 overflow-auto relative">
         {editor && (
-          <BlockNoteViewRaw
+          <BlockNoteView
             editor={editor}
             onChange={handleChange}
             theme="dark"
