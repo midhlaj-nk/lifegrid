@@ -2,7 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BlockNoteEditor } from "@blocknote/core";
-import { BlockNoteViewRaw, useCreateBlockNote } from "@blocknote/react";
+import {
+  BlockNoteViewRaw,
+  SuggestionMenuController,
+  getDefaultReactSlashMenuItems,
+  useCreateBlockNote,
+} from "@blocknote/react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/react/style.css";
 import { ArrowLeft } from "lucide-react";
@@ -69,12 +74,20 @@ export function PlateEditor({
           {saveState === "saving" ? "Saving..." : saveState === "saved" ? "Saved" : "Unsaved"}
         </span>
       </div>
-      <div className="flex-1 overflow-auto">
-        <BlockNoteViewRaw
-          editor={editor}
-          onChange={handleChange}
-          theme="dark"
-        />
+      <div className="flex-1 overflow-auto relative">
+        {editor && (
+          <div>
+            <BlockNoteViewRaw
+              editor={editor}
+              onChange={handleChange}
+              theme="dark"
+            />
+            <SuggestionMenuController
+              triggerCharacter="/"
+              getItems={async () => getDefaultReactSlashMenuItems(editor)}
+            />
+          </div>
+        )}
       </div>
     </div>
   );
