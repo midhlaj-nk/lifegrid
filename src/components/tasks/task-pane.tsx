@@ -70,7 +70,7 @@ export function TaskPaneProvider({
       <SidePane
         open={!!task}
         onClose={() => setTask(null)}
-        title="Task"
+        title={task?.title ?? "Task"}
       >
         {task && (
           <TaskDetail
