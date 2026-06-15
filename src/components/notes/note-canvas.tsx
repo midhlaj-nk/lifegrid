@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import "@excalidraw/excalidraw/index.css";
 import { updateNote } from "@/actions/notes";
 import { cn } from "@/lib/utils";
+import { FullscreenPortal } from "@/components/shell/fullscreen-portal";
 
 // Minimal structural types — we only serialize, never introspect. Avoids the
 // fragile deep type-path imports from the excalidraw package.
@@ -96,7 +97,8 @@ export function NoteCanvas({
   // True fullscreen: fixed overlay escaping the app shell. Excalidraw needs the
   // whole viewport, same as the spreadsheet editor.
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-background">
+    <FullscreenPortal>
+    <div className="fixed inset-0 z-[100] flex flex-col bg-background">
       <div className="flex items-center gap-2 border-b border-border px-3 py-2">
         <Link
           href="/notes"
@@ -144,5 +146,6 @@ export function NoteCanvas({
         />
       </div>
     </div>
+    </FullscreenPortal>
   );
 }
