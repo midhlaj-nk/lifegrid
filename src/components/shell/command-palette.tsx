@@ -4,7 +4,8 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import { FileText, Search, Sheet, CheckSquare, Loader2 } from "lucide-react";
-import { globalSearch, type SearchResult } from "@/actions/global-search";
+import { globalSearch, fetchTaskForPane, type SearchResult } from "@/actions/global-search";
+import { useTaskPane } from "@/components/tasks/task-pane";
 import { cn } from "@/lib/utils";
 
 const TYPE_ICON = {
@@ -15,6 +16,7 @@ const TYPE_ICON = {
 
 function Palette({ onClose }: { onClose: () => void }) {
   const router = useRouter();
+  const openTask = useTaskPane();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [active, setActive] = useState(0);
@@ -45,13 +47,17 @@ function Palette({ onClose }: { onClose: () => void }) {
     (r: SearchResult) => {
       onClose();
       if (r.type === "task") {
-        // navigate to tasks page; task pane open not possible here without refetch
-        router.push(r.url);
+        // Fetch full task and open the pane directly
+        startTransition(async () => {
+          const task = await fetchTaskForPane(r.id);
+          if (task) openTask(task);
+          else router.push("/tasks");
+        });
       } else {
         router.push(r.url);
       }
     },
-    [onClose, router]
+    [onClose, openTask, router, startTransition]
   );
 
   function onKey(e: React.KeyboardEvent) {

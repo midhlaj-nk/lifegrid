@@ -3,7 +3,8 @@
 import { db } from "@/db";
 import { notes, sheets, tasks } from "@/db/schema";
 import { requireUser } from "@/lib/session";
-import { and, eq, like, or } from "drizzle-orm";
+import { getTaskById } from "@/lib/queries";
+import { and, eq, like } from "drizzle-orm";
 
 export type SearchResult = {
   id: string;
@@ -12,6 +13,11 @@ export type SearchResult = {
   url: string;
   icon?: string;
 };
+
+export async function fetchTaskForPane(id: string) {
+  const user = await requireUser();
+  return getTaskById(user.id, id);
+}
 
 export async function globalSearch(query: string): Promise<SearchResult[]> {
   const user = await requireUser();
