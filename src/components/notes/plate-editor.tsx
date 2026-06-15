@@ -17,6 +17,7 @@ import { CheckSquare, FileText, Link2 } from "lucide-react";
 import { toast } from "sonner";
 import { updateNote, linkNoteToTask } from "@/actions/notes";
 import { toggleTaskDone } from "@/actions/tasks";
+import { useTheme } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 
 type LinkTarget = { id: string; title: string; icon?: string };
@@ -127,6 +128,7 @@ export function PlateEditor({
   notes?: LinkTarget[];
 }) {
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
   const [saveState, setSaveState] = useState<"saved" | "saving" | "dirty">("saved");
   const [picker, setPicker] = useState<"task" | "note" | null>(null);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -267,7 +269,7 @@ export function PlateEditor({
         <BlockNoteView
           editor={editor}
           onChange={handleChange}
-          theme="dark"
+          theme={resolvedTheme === "light" ? "light" : "dark"}
           slashMenu={false}
         >
           <SuggestionMenuController
