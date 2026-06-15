@@ -1,0 +1,21 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - img [ref=e5]
+      - generic [ref=e11]:
+        - heading "Life Grid" [level=1] [ref=e12]
+        - paragraph [ref=e13]: Sign in to your workspace
+    - generic [ref=e14]:
+      - generic [ref=e15]:
+        - text: Email
+        - textbox "Email" [ref=e16]
+      - generic [ref=e17]:
+        - text: Password
+        - textbox "Password" [ref=e18]
+      - button "Sign in" [ref=e19]
+    - paragraph [ref=e20]:
+      - text: First time?
+      - link "Create the account" [ref=e21] [cursor=pointer]:
+        - /url: /sign-up
+  - region "Notifications alt+T"
+  - alert [ref=e22]

@@ -4,8 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { BlockNoteEditor } from "@blocknote/core";
 import {
   BlockNoteViewRaw,
-  SuggestionMenuController,
-  getDefaultReactSlashMenuItems,
   useCreateBlockNote,
 } from "@blocknote/react";
 import "@blocknote/core/fonts/inter.css";
@@ -76,17 +74,11 @@ export function PlateEditor({
       </div>
       <div className="flex-1 overflow-auto relative">
         {editor && (
-          <div>
-            <BlockNoteViewRaw
-              editor={editor}
-              onChange={handleChange}
-              theme="dark"
-            />
-            <SuggestionMenuController
-              triggerCharacter="/"
-              getItems={async () => getDefaultReactSlashMenuItems(editor)}
-            />
-          </div>
+          <BlockNoteViewRaw
+            editor={editor}
+            onChange={handleChange}
+            theme="dark"
+          />
         )}
       </div>
     </div>
