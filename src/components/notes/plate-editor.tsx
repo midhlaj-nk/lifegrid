@@ -248,9 +248,9 @@ function CodeLeaf({ children, ...props }: React.ComponentProps<typeof PlateLeaf>
   );
 }
 
-function SlashCommandElement({ children }: React.ComponentProps<typeof PlateElement>) {
+function SlashCommandElement({ children, ...props }: React.ComponentProps<typeof PlateElement>) {
   return (
-    <PlateElement className="my-1 flex animate-scale-in flex-col gap-1 rounded-lg border border-border bg-card p-2 shadow-lg">
+    <PlateElement className="my-1 flex animate-scale-in flex-col gap-1 rounded-lg border border-border bg-card p-2 shadow-lg" {...props}>
       {children}
     </PlateElement>
   );
@@ -371,22 +371,6 @@ export function PlateEditor({
           AutoformatPlugin.configure({ options: { rules: autoformatRules, enableUndoOnDelete: true } }),
           CodeBlockPlugin,
           CodeLinePlugin,
-          SlashPlugin.configure({
-            options: {
-              trigger: "/",
-              commands: [
-                { value: "h1", text: "Heading 1", icon: <Heading1 className="h-4 w-4" /> },
-                { value: "h2", text: "Heading 2", icon: <Heading2 className="h-4 w-4" /> },
-                { value: "h3", text: "Heading 3", icon: <Heading3 className="h-4 w-4" /> },
-                { value: "ul", text: "Bullet list", icon: <List className="h-4 w-4" /> },
-                { value: "ol", text: "Numbered list", icon: <List className="h-4 w-4" /> },
-                { value: "todo", text: "Checklist", icon: <CheckSquare className="h-4 w-4" /> },
-                { value: "blockquote", text: "Quote", icon: <Quote className="h-4 w-4" /> },
-                { value: "hr", text: "Divider", icon: <Minus className="h-4 w-4" /> },
-              ],
-            },
-          }),
-          SlashInputPlugin,
         ],
         value: initialValue ?? [{ type: "p", children: [{ text: "" }] }],
         components: {
@@ -405,7 +389,6 @@ export function PlateEditor({
           [UnderlinePlugin.key]: UnderlineLeaf,
           [StrikethroughPlugin.key]: StrikethroughLeaf,
           [CodePlugin.key]: CodeLeaf,
-          [SlashPlugin.key]: SlashCommandElement,
         },
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
