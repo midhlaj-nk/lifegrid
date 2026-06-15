@@ -432,60 +432,6 @@ export const noteTaskLinks = pgTable(
   (t) => [primaryKey({ columns: [t.noteId, t.taskId] })]
 );
 
-// ---------- Worklog (ported from worklog-daily) ----------
-
-export const worklogSettings = pgTable("worklog_settings", {
-  id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .unique()
-    .references(() => user.id, { onDelete: "cascade" }),
-  odooUrl: text("odoo_url").notNull().default(""),
-  odooUsername: text("odoo_username").notNull().default(""),
-  odooPassword: text("odoo_password").notNull().default(""),
-  odooDatabase: text("odoo_database").notNull().default(""),
-  emailRecipients: text("email_recipients").notNull().default(""),
-  emailCc: text("email_cc").notNull().default(""),
-  emailBcc: text("email_bcc").notNull().default(""),
-  signatureName: text("signature_name").notNull().default(""),
-  signatureDesignation: text("signature_designation").notNull().default(""),
-  signatureDepartment: text("signature_department").notNull().default(""),
-  signatureCompany: text("signature_company").notNull().default(""),
-  signatureEmail: text("signature_email").notNull().default(""),
-  signaturePhone: text("signature_phone").notNull().default(""),
-  signatureWhatsapp: text("signature_whatsapp").notNull().default(""),
-  descriptionStyle: text("description_style").notNull().default(""),
-  weeklyFilterTo: text("weekly_filter_to").notNull().default(""),
-  displayName: text("display_name").notNull().default(""),
-  wordCountMode: text("word_count_mode").notNull().default("concise"),
-  wordCountShort: integer("word_count_short").notNull().default(20),
-  wordCountConcise: integer("word_count_concise").notNull().default(70),
-  wordCountDetailed: integer("word_count_detailed").notNull().default(110),
-  aiProvider: text("ai_provider").notNull().default("openrouter"),
-  openrouterApiKey: text("openrouter_api_key").notNull().default(""),
-  openrouterModel: text("openrouter_model").notNull().default(""),
-  geminiApiKey: text("gemini_api_key").notNull().default(""),
-  geminiModel: text("gemini_model").notNull().default(""),
-  dailyColumns: text("daily_columns").notNull().default(""),
-  weeklyColumns: text("weekly_columns").notNull().default(""),
-  dailyCustomColumns: text("daily_custom_columns").notNull().default(""),
-  dailyColumnWidths: text("daily_column_widths").notNull().default(""),
-  weeklyColumnWidths: text("weekly_column_widths").notNull().default(""),
-});
-
-export const googleAuth = pgTable("google_auth", {
-  id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .unique()
-    .references(() => user.id, { onDelete: "cascade" }),
-  email: text("email").notNull().default(""),
-  accessToken: text("access_token").notNull(),
-  refreshToken: text("refresh_token").notNull().default(""),
-  expiresAt: timestamp("expires_at"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
 export const githubAuth = pgTable("github_auth", {
   id: text("id").primaryKey(),
   userId: text("user_id")
@@ -511,18 +457,6 @@ export const repoMappings = pgTable("repo_mappings", {
   taskName: text("task_name").notNull(),
   count: integer("count").notNull().default(1),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
-
-export const worklogSubmissions = pgTable("worklog_submissions", {
-  id: text("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  date: text("date").notNull(),
-  entries: text("entries").notNull(),
-  emailSent: boolean("email_sent").notNull().default(false),
-  odooSynced: boolean("odoo_synced").notNull().default(false),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const taskTags = pgTable(

@@ -13,7 +13,6 @@ const APPS: { href: string; label: string; icon: string; color: string }[] = [
   { href: "/goals", label: "Goals", icon: "🎯", color: "#8b5cf6" },
   { href: "/finance", label: "Finance", icon: "💰", color: "#14b8a6" },
   { href: "/vault", label: "Vault", icon: "🔐", color: "#64748b" },
-  { href: "/worklog", label: "Worklog", icon: "💼", color: "#3b82f6" },
   { href: "/assistant", label: "Assistant", icon: "🤖", color: "#a855f7" },
   { href: "/insights", label: "Insights", icon: "✨", color: "#eab308" },
   { href: "/settings", label: "Settings", icon: "⚙️", color: "#71717a" },

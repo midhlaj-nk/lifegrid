@@ -84,16 +84,6 @@ const SECTIONS: { key: string; label: string; links: { href: string; label: stri
       { href: "/insights", label: "Insights", icon: Sparkles },
     ],
   },
-  {
-    key: "worklog",
-    label: "Worklog",
-    links: [
-      { href: "/worklog", label: "Daily report", icon: Briefcase },
-      { href: "/worklog/weekly", label: "Weekly report", icon: CalendarDays },
-      { href: "/worklog/history", label: "History", icon: FileClock },
-      { href: "/worklog/settings", label: "Worklog settings", icon: Settings2 },
-    ],
-  },
 ];
 
 const STORAGE_KEY = "sidebar-sections-v1";
