@@ -28,7 +28,21 @@ export function PlateEditor({
     if (!initialContent) return undefined;
     try {
       const parsed = JSON.parse(initialContent);
-      if (Array.isArray(parsed) && parsed.length > 0) {
+      // Must be a non-empty array of well-formed BlockNote blocks
+      // (each block has a string `type` and `id`). Anything else —
+      // empty arrays, old Plate/markdown content, corrupted JSON —
+      // falls back to a fresh editor instead of crashing.
+      if (
+        Array.isArray(parsed) &&
+        parsed.length > 0 &&
+        parsed.every(
+          (b) =>
+            b &&
+            typeof b === "object" &&
+            typeof b.type === "string" &&
+            typeof b.id === "string"
+        )
+      ) {
         return parsed;
       }
       return undefined;
