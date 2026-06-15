@@ -9,7 +9,8 @@ import {
   useTransition,
 } from "react";
 import { useRouter } from "next/navigation";
-import { Check, Flag, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { Check, FileText, Flag, Plus, Trash2 } from "lucide-react";
 import { SidePane } from "@/components/ui/side-pane";
 import { useConfirm } from "@/components/ui/app-dialog";
 import {
@@ -19,6 +20,7 @@ import {
   createTask,
 } from "@/actions/tasks";
 import { createTag } from "@/actions/organize";
+import { getLinkedNotes } from "@/actions/notes";
 import {
   parseRecurrence,
   type Recurrence,
@@ -115,6 +117,11 @@ function TaskDetail({
   const [subtasks, setSubtasks] = useState<TaskRow[]>(task.subtasks);
   const [newSubtask, setNewSubtask] = useState("");
   const [done, setDone] = useState(task.status === "done");
+  const [linkedNotes, setLinkedNotes] = useState<{ id: string; title: string; icon: string }[]>([]);
+
+  useEffect(() => {
+    getLinkedNotes(task.id).then(setLinkedNotes).catch(() => {});
+  }, [task.id]);
 
   const initialRec = parseRecurrence(task.recurrence);
   const [recIdx, setRecIdx] = useState(() => {
@@ -421,6 +428,28 @@ function TaskDetail({
           </div>
         </div>
       </div>
+
+      {/* linked notes (backlinks) */}
+      {linkedNotes.length > 0 && (
+        <div>
+          <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Linked notes
+          </p>
+          <div className="space-y-1">
+            {linkedNotes.map((n) => (
+              <Link
+                key={n.id}
+                href={`/notes/${n.id}`}
+                onClick={onClose}
+                className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent"
+              >
+                <span className="shrink-0">{n.icon || <FileText className="h-3.5 w-3.5 text-muted-foreground" />}</span>
+                <span className="truncate">{n.title}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* danger */}
       <div className="border-t border-border pt-3">

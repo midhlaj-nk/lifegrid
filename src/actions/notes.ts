@@ -85,6 +85,16 @@ export async function linkNoteToTask(noteId: string, taskId: string) {
   revalidatePath(`/notes/${noteId}`);
 }
 
+export async function getLinkedNotes(taskId: string) {
+  const user = await requireUser();
+  const rows = await db
+    .select({ id: notes.id, title: notes.title, icon: notes.icon })
+    .from(noteTaskLinks)
+    .innerJoin(notes, eq(noteTaskLinks.noteId, notes.id))
+    .where(and(eq(noteTaskLinks.taskId, taskId), eq(notes.userId, user.id)));
+  return rows;
+}
+
 export async function unlinkNoteFromTask(noteId: string, taskId: string) {
   await requireUser();
   await db
