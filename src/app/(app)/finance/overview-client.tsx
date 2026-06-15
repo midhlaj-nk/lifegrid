@@ -22,15 +22,81 @@ const ACCOUNT_TYPE_ICON: Record<string, string> = {
   upi: "📱",
 };
 
+function SpendingChart({ data }: { data: { date: string; amountMinor: number }[] }) {
+  const [hovered, setHovered] = useState<number | null>(null);
+
+  const byDay = new Map<string, number>();
+  for (const tx of data) {
+    byDay.set(tx.date, (byDay.get(tx.date) ?? 0) + tx.amountMinor);
+  }
+
+  const days = Array.from({ length: 30 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() - (29 - i));
+    const dateStr = d.toISOString().slice(0, 10);
+    return { date: dateStr, amount: byDay.get(dateStr) ?? 0 };
+  });
+
+  const max = Math.max(...days.map((d) => d.amount), 1);
+  const BAR_W = 100 / 30;
+
+  return (
+    <div className="relative">
+      <svg
+        viewBox="0 0 100 40"
+        className="w-full"
+        preserveAspectRatio="none"
+        style={{ height: 80 }}
+      >
+        {days.map((d, i) => {
+          const h = (d.amount / max) * 36;
+          const x = i * BAR_W + BAR_W * 0.1;
+          const w = BAR_W * 0.8;
+          return (
+            <rect
+              key={d.date}
+              x={x}
+              y={40 - h}
+              width={w}
+              height={h || 0.5}
+              className={hovered === i ? "fill-primary" : "fill-primary/40"}
+              rx="0.5"
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered(null)}
+            />
+          );
+        })}
+      </svg>
+      {hovered !== null && (
+        <div
+          className="pointer-events-none absolute top-0 text-xs bg-popover border border-border rounded px-2 py-1 shadow-md z-10"
+          style={{
+            left: `${(hovered / 30) * 100}%`,
+            transform: "translateX(-50%)",
+          }}
+        >
+          <div className="font-medium">{days[hovered].date.slice(5)}</div>
+          <div>{formatINR(days[hovered].amount)}</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function OverviewSections(props: {
   accounts: { id: string; name: string; type: string; color: string; balanceMinor: number }[];
   budgets: { id: string; name: string; icon: string; limitMinor: number; spentMinor: number }[];
   subscriptions: { id: string; name: string; amountMinor: number; nextDueDate: string; cadence: string }[];
   goals: { id: string; name: string; targetMinor: number; savedMinor: number; deadline: string | null }[];
   lent: { id: string; person: string; direction: string; amountMinor: number; date: string; settled: boolean }[];
+  last30Days: { date: string; amountMinor: number }[];
 }) {
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="space-y-4">
+      <Section title="Spending — last 30 days">
+        <SpendingChart data={props.last30Days} />
+      </Section>
+      <div className="grid gap-4 lg:grid-cols-2">
       <Section title="Accounts">
         {props.accounts.length ? (
           <div className="space-y-1.5">
@@ -122,6 +188,7 @@ export function OverviewSections(props: {
 
       <SavingsGoals goals={props.goals} />
       <LentBorrowed lent={props.lent} />
+    </div>
     </div>
   );
 }

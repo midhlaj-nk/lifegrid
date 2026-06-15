@@ -160,6 +160,13 @@ export function PlateEditor({
   const editor = useCreateBlockNote({
     schema,
     ...(validatedContent ? { initialContent: validatedContent } : {}),
+    uploadFile: async (file: File) => {
+      const form = new FormData();
+      form.append("file", file);
+      const res = await fetch("/api/upload", { method: "POST", body: form });
+      const data = await res.json();
+      return data.url as string;
+    },
   });
 
   const handleChange = useCallback(() => {

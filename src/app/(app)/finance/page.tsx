@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, subDays } from "date-fns";
 import { requireUser } from "@/lib/session";
 import {
   ensureDefaultCategories,
@@ -14,6 +14,9 @@ import {
 } from "@/lib/finance-queries";
 import { formatINR } from "@/lib/money";
 import { OverviewSections } from "./overview-client";
+import { db } from "@/db";
+import { finTransactions } from "@/db/schema";
+import { and, eq, gte, lte } from "drizzle-orm";
 
 export default async function FinanceOverview() {
   const user = await requireUser();
@@ -21,13 +24,30 @@ export default async function FinanceOverview() {
   await processDueSubscriptions();
 
   const month = format(new Date(), "yyyy-MM");
-  const [accounts, monthTxs, budgets, subs, goals, lent] = await Promise.all([
+  const thirtyDaysAgo = format(subDays(new Date(), 29), "yyyy-MM-dd");
+  const today = format(new Date(), "yyyy-MM-dd");
+
+  const [accounts, monthTxs, budgets, subs, goals, lent, last30Days] = await Promise.all([
     getAccountsWithBalances(user.id),
     getMonthTransactions(user.id, month),
     getBudgetsWithSpend(user.id, month),
     getSubscriptions(user.id),
     getSavingsGoals(user.id),
     getLent(user.id),
+    db
+      .select({
+        date: finTransactions.date,
+        amountMinor: finTransactions.amountMinor,
+      })
+      .from(finTransactions)
+      .where(
+        and(
+          eq(finTransactions.userId, user.id),
+          eq(finTransactions.type, "expense"),
+          gte(finTransactions.date, thirtyDaysAgo),
+          lte(finTransactions.date, today),
+        )
+      ),
   ]);
 
   const income = monthTxs
@@ -105,6 +125,7 @@ export default async function FinanceOverview() {
           date: l.date,
           settled: l.settled,
         }))}
+        last30Days={last30Days}
       />
     </div>
   );

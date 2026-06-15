@@ -39,6 +39,7 @@ interface SidebarProps {
   areas: { id: string; name: string; color: string }[];
   projects: { id: string; name: string; color: string; areaId: string | null }[];
   tags: { id: string; name: string; color: string }[];
+  overdueCount?: number;
   onNavigate?: () => void;
 }
 
@@ -88,7 +89,7 @@ const SECTIONS: { key: string; label: string; links: { href: string; label: stri
 
 const STORAGE_KEY = "sidebar-sections-v1";
 
-export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
+export function Sidebar({ areas, projects, tags, overdueCount, onNavigate }: SidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [hydrated, setHydrated] = useState(false);
@@ -122,7 +123,8 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
     href: string,
     label: string,
     dotColor?: string,
-    Icon?: IconType
+    Icon?: IconType,
+    badge?: number
   ) {
     const active = pathname === href;
     return (
@@ -145,7 +147,12 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
             style={{ backgroundColor: dotColor }}
           />
         )}
-        <span className="truncate">{label}</span>
+        <span className="truncate flex-1">{label}</span>
+        {badge && badge > 0 ? (
+          <span className="ml-auto flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
+            {badge > 99 ? "99+" : badge}
+          </span>
+        ) : null}
       </Link>
     );
   }
@@ -195,7 +202,7 @@ export function Sidebar({ areas, projects, tags, onNavigate }: SidebarProps) {
             <div className="overflow-hidden">
               <div className="space-y-0.5 pb-0.5">
                 {section.links.map((l) =>
-                  navLink(l.href, l.label, undefined, l.icon)
+                  navLink(l.href, l.label, undefined, l.icon, l.href === "/today" ? overdueCount : undefined)
                 )}
               </div>
             </div>

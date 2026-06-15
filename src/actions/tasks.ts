@@ -143,6 +143,15 @@ export async function setTaskStatus(
   revalidateTaskViews();
 }
 
+export async function reorderTasks(orderedIds: string[]) {
+  const user = await requireUser();
+  await Promise.all(
+    orderedIds.map((id, i) =>
+      db.update(tasks).set({ sortOrder: i }).where(and(eq(tasks.id, id), eq(tasks.userId, user.id)))
+    )
+  );
+}
+
 /** Move a task into a kanban column. "done" completes; others reopen. */
 export async function setTaskKanbanColumn(id: string, column: string) {
   const user = await requireUser();

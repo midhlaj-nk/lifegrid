@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { LayoutGrid, ListTree, Plus, Search } from "lucide-react";
+import { ChevronDown, FileText, LayoutGrid, ListTree, Plus, Search } from "lucide-react";
 import { createNote } from "@/actions/notes";
 import { coverStyle } from "@/components/cover-header";
 import { NotesTree, type NoteNode } from "./notes-tree";
@@ -15,17 +15,52 @@ export interface LandingNote extends NoteNode {
   updatedAt: string;
 }
 
+const TEMPLATES = [
+  { label: "Daily Journal", icon: "📔", sections: ["Gratitude", "Wins", "Focus"] },
+  { label: "Meeting Notes", icon: "📋", sections: ["Agenda", "Action Items", "Notes"] },
+  { label: "Project Plan", icon: "🗺️", sections: ["Goal", "Milestones", "Tasks"] },
+  { label: "Book Notes", icon: "📚", sections: ["Summary", "Key Ideas", "Quotes"] },
+];
+
+function buildTemplateContent(sections: string[]): string {
+  const blocks = sections.flatMap((s) => [
+    {
+      id: crypto.randomUUID(),
+      type: "heading",
+      props: { textColor: "default", backgroundColor: "default", textAlignment: "left", level: 2 },
+      content: [{ type: "text", text: s, styles: {} }],
+      children: [],
+    },
+    {
+      id: crypto.randomUUID(),
+      type: "paragraph",
+      props: { textColor: "default", backgroundColor: "default", textAlignment: "left" },
+      content: [],
+      children: [],
+    },
+  ]);
+  return JSON.stringify(blocks);
+}
+
 export function NotesLanding({ notes }: { notes: LandingNote[] }) {
   const router = useRouter();
   const [view, setView] = useState<"gallery" | "tree">("gallery");
   const [query, setQuery] = useState("");
   const [pending, startTransition] = useTransition();
+  const [showTemplates, setShowTemplates] = useState(false);
 
   const q = query.trim().toLowerCase();
   const filtered = q
     ? notes.filter((n) => n.title.toLowerCase().includes(q))
     : notes;
   const roots = filtered.filter((n) => !n.parentId || q);
+
+  useEffect(() => {
+    if (!showTemplates) return;
+    const close = () => setShowTemplates(false);
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [showTemplates]);
 
   return (
     <div className="space-y-5">
@@ -72,6 +107,42 @@ export function NotesLanding({ notes }: { notes: LandingNote[] }) {
             >
               <Plus className="h-3.5 w-3.5" /> New page
             </button>
+            <div
+              className="relative"
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowTemplates((v) => !v)}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+              >
+                <FileText className="h-3.5 w-3.5" /> Templates
+                <ChevronDown className="h-3 w-3" />
+              </button>
+              {showTemplates && (
+                <div className="absolute left-0 top-full z-10 mt-1 w-48 rounded-lg border border-border bg-popover shadow-lg">
+                  {TEMPLATES.map((t) => (
+                    <button
+                      key={t.label}
+                      disabled={pending}
+                      onClick={() => {
+                        setShowTemplates(false);
+                        startTransition(async () => {
+                          const id = await createNote({
+                            title: t.label,
+                            icon: t.icon,
+                            content: buildTemplateContent(t.sections),
+                          });
+                          router.push(`/notes/${id}`);
+                        });
+                      }}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent disabled:opacity-50"
+                    >
+                      <span>{t.icon}</span> {t.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <div className="relative flex-1">
               <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-muted-foreground" />
               <input

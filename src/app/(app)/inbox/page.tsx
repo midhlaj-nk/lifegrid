@@ -1,7 +1,7 @@
 import { requireUser } from "@/lib/session";
 import { getAllOpenTasks, getSidebarData } from "@/lib/queries";
 import { QuickAdd } from "@/components/tasks/quick-add";
-import { TaskList } from "@/components/tasks/task-list";
+import { FilterableTaskList } from "@/components/tasks/task-list";
 
 export default async function InboxPage() {
   const user = await requireUser();
@@ -24,7 +24,7 @@ export default async function InboxPage() {
         </p>
       </header>
       <QuickAdd projects={projects} />
-      <TaskList tasks={inbox} emptyText="Inbox zero." />
+      <FilterableTaskList tasks={inbox} emptyText="Inbox zero." />
     </div>
   );
 }

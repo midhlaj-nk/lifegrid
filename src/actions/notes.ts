@@ -10,6 +10,8 @@ import { randomUUID } from "crypto";
 export async function createNote(input: {
   parentId?: string | null;
   title?: string;
+  icon?: string;
+  content?: string;
 }) {
   const user = await requireUser();
   const id = randomUUID();
@@ -18,6 +20,8 @@ export async function createNote(input: {
     userId: user.id,
     parentId: input.parentId ?? null,
     title: input.title?.trim() || "Untitled",
+    ...(input.icon ? { icon: input.icon } : {}),
+    ...(input.content ? { content: input.content } : {}),
   });
   revalidatePath("/notes", "layout");
   return id;

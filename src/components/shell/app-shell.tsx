@@ -18,6 +18,7 @@ interface AppShellProps {
   projects: { id: string; name: string; color: string; areaId: string | null }[];
   tags: { id: string; name: string; color: string }[];
   userName: string;
+  overdueCount?: number;
   children: React.ReactNode;
 }
 
@@ -35,7 +36,7 @@ function ThemeToggle() {
   );
 }
 
-export function AppShell({ areas, projects, tags, userName, children }: AppShellProps) {
+export function AppShell({ areas, projects, tags, userName, overdueCount, children }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
@@ -64,7 +65,7 @@ export function AppShell({ areas, projects, tags, userName, children }: AppShell
             </Link>
           </div>
         </div>
-        <Sidebar areas={areas} projects={projects} tags={tags} />
+        <Sidebar areas={areas} projects={projects} tags={tags} overdueCount={overdueCount} />
       </aside>
 
       {/* Mobile drawer */}
@@ -100,6 +101,7 @@ export function AppShell({ areas, projects, tags, userName, children }: AppShell
               areas={areas}
               projects={projects}
               tags={tags}
+              overdueCount={overdueCount}
               onNavigate={() => setMobileOpen(false)}
             />
           </div>

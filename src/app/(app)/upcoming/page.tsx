@@ -2,7 +2,7 @@ import { addDays, format, parseISO } from "date-fns";
 import { requireUser } from "@/lib/session";
 import { getAllOpenTasks, getSidebarData } from "@/lib/queries";
 import { QuickAdd } from "@/components/tasks/quick-add";
-import { TaskList, Section } from "@/components/tasks/task-list";
+import { FilterableTaskList, Section } from "@/components/tasks/task-list";
 
 export default async function UpcomingPage() {
   const user = await requireUser();
@@ -41,19 +41,19 @@ export default async function UpcomingPage() {
 
       {overdue.length > 0 && (
         <Section title="Overdue" count={overdue.length} tone="danger">
-          <TaskList tasks={overdue} />
+          <FilterableTaskList tasks={overdue} />
         </Section>
       )}
 
       {days.map((d) => (
         <Section key={d.key} title={d.label} count={d.tasks.length}>
-          <TaskList tasks={d.tasks} emptyText="—" />
+          <FilterableTaskList tasks={d.tasks} emptyText="—" />
         </Section>
       ))}
 
       {later.length > 0 && (
         <Section title="Later" count={later.length}>
-          <TaskList
+          <FilterableTaskList
             tasks={[...later].sort((a, b) =>
               (a.dueDate ?? "").localeCompare(b.dueDate ?? "")
             )}

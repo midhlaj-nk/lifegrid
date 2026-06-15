@@ -10,6 +10,8 @@ import { TagsSettings } from "./tags-settings";
 import { VaultResetForm } from "./vault-reset-form";
 import { AdminSettings } from "./admin-settings";
 import { SettingsShell } from "./settings-shell";
+import { ShortcutsSettings } from "./shortcuts-settings";
+import { getTokenForUser, createTokenForUser } from "@/lib/api-tokens";
 
 export default async function SettingsPage() {
   const user = await requireUser();
@@ -19,6 +21,9 @@ export default async function SettingsPage() {
     getTags(),
     getAppConfig(),
   ]);
+
+  let shortcutsToken = await getTokenForUser(user.id);
+  if (!shortcutsToken) shortcutsToken = await createTokenForUser(user.id);
 
   const sections = {
     account: (
@@ -81,6 +86,17 @@ export default async function SettingsPage() {
         </p>
         <div className="rounded-xl border border-border p-5">
           <VaultResetForm hasVault={!!vaultMeta} />
+        </div>
+      </div>
+    ),
+    shortcuts: (
+      <div>
+        <h2 className="mb-1 text-base font-semibold">iOS Shortcuts</h2>
+        <p className="mb-6 text-xs text-muted-foreground">
+          Connect the iOS Shortcuts app to your life-os via API token.
+        </p>
+        <div className="rounded-xl border border-border p-5">
+          <ShortcutsSettings initialToken={shortcutsToken} />
         </div>
       </div>
     ),

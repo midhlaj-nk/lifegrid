@@ -2,7 +2,7 @@ import { format } from "date-fns";
 import { requireUser } from "@/lib/session";
 import { getAllOpenTasks, getSidebarData } from "@/lib/queries";
 import { QuickAdd } from "@/components/tasks/quick-add";
-import { TaskList, Section } from "@/components/tasks/task-list";
+import { FilterableTaskList, Section } from "@/components/tasks/task-list";
 
 export default async function TodayPage() {
   const user = await requireUser();
@@ -35,17 +35,17 @@ export default async function TodayPage() {
 
       {overdue.length > 0 && (
         <Section title="Overdue" count={overdue.length} tone="danger">
-          <TaskList tasks={overdue} />
+          <FilterableTaskList tasks={overdue} />
         </Section>
       )}
 
       <Section title="Due today" count={dueToday.length}>
-        <TaskList tasks={dueToday} emptyText="Nothing due today." />
+        <FilterableTaskList tasks={dueToday} emptyText="Nothing due today." />
       </Section>
 
       {doneToday.length > 0 && (
         <Section title="Completed today" count={doneToday.length}>
-          <TaskList tasks={doneToday} />
+          <FilterableTaskList tasks={doneToday} />
         </Section>
       )}
     </div>

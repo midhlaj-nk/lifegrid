@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Brush, Brain, LockKeyhole, ShieldCheck, Tag, User } from "lucide-react";
+import { Brush, Brain, LockKeyhole, ShieldCheck, Tag, User, Smartphone } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -10,6 +10,7 @@ const NAV = [
   { key: "ai",         label: "AI",         icon: Brain       },
   { key: "tags",       label: "Tags",       icon: Tag         },
   { key: "vault",      label: "Vault",      icon: LockKeyhole },
+  { key: "shortcuts",  label: "Shortcuts",  icon: Smartphone  },
   { key: "admin",      label: "Admin",      icon: ShieldCheck },
 ] as const;
 

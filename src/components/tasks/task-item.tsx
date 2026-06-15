@@ -143,12 +143,21 @@ export function TaskItem({ task }: { task: TaskWithMeta }) {
                 #{t.name}
               </span>
             ))}
-            {task.subtasks.length > 0 && (
-              <span>
-                {task.subtasks.filter((s) => s.status === "done").length}/
-                {task.subtasks.length}
-              </span>
-            )}
+            {task.subtasks.length > 0 && (() => {
+              const doneCount = task.subtasks.filter((s) => s.status === "done").length;
+              const pct = Math.round((doneCount / task.subtasks.length) * 100);
+              return (
+                <span className="inline-flex items-center gap-1.5">
+                  <span className="h-1.5 w-12 overflow-hidden rounded-full bg-muted">
+                    <span
+                      className="block h-full rounded-full bg-primary/70 transition-all"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </span>
+                  <span>{doneCount}/{task.subtasks.length}</span>
+                </span>
+              );
+            })()}
           </div>
         </div>
 

@@ -23,7 +23,6 @@ import { createTag } from "@/actions/organize";
 import { getLinkedNotes } from "@/actions/notes";
 import {
   parseRecurrence,
-  type Recurrence,
 } from "@/lib/recurrence";
 import { cn } from "@/lib/utils";
 import type { TaskWithMeta, TaskRow } from "@/lib/queries";
@@ -32,13 +31,6 @@ type TagItem = { id: string; name: string; color: string };
 type ProjectItem = { id: string; name: string; color: string; areaId: string | null };
 type AreaItem = { id: string; name: string; color: string };
 
-const RECURRENCE_PRESETS: { label: string; value: Recurrence | null }[] = [
-  { label: "No repeat", value: null },
-  { label: "Daily", value: { freq: "daily", interval: 1 } },
-  { label: "Weekly", value: { freq: "weekly", interval: 1 } },
-  { label: "Weekdays", value: { freq: "weekly", interval: 1, byWeekday: [1, 2, 3, 4, 5] } },
-  { label: "Monthly", value: { freq: "monthly", interval: 1 } },
-];
 
 type OpenTask = (task: TaskWithMeta) => void;
 
@@ -124,19 +116,16 @@ function TaskDetail({
   }, [task.id]);
 
   const initialRec = parseRecurrence(task.recurrence);
-  const [recIdx, setRecIdx] = useState(() => {
-    if (!initialRec) return 0;
-    const i = RECURRENCE_PRESETS.findIndex(
-      (p) => JSON.stringify(p.value) === JSON.stringify(initialRec)
-    );
-    return i === -1 ? 0 : i;
-  });
+  const [recFreq, setRecFreq] = useState<"none" | "daily" | "weekly" | "monthly">(
+    initialRec?.freq ?? "none"
+  );
+  const [recInterval, setRecInterval] = useState(initialRec?.interval ?? 1);
 
   // Debounced autosave of the scalar fields — Notion-like (no Save button).
   useEffect(() => {
     const t = setTimeout(() => {
       if (!title.trim()) return;
-      const rec = RECURRENCE_PRESETS[recIdx].value;
+      const rec = recFreq !== "none" ? { freq: recFreq, interval: recInterval } : null;
       updateTask(task.id, {
         title: title.trim(),
         note,
@@ -151,7 +140,7 @@ function TaskDetail({
     }, 600);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, note, dueDate, dueTime, priority, projectId, areaId, recIdx, tagIds]);
+  }, [title, note, dueDate, dueTime, priority, projectId, areaId, recFreq, recInterval, tagIds]);
 
   function addNewTag() {
     const v = newTag.trim();
@@ -321,16 +310,33 @@ function TaskDetail({
 
         <Field label="Repeat">
           <select
-            value={recIdx}
-            onChange={(e) => setRecIdx(Number(e.target.value))}
+            value={recFreq}
+            onChange={(e) => setRecFreq(e.target.value as "none" | "daily" | "weekly" | "monthly")}
             className="h-8 rounded-md border border-input bg-background px-2 outline-none"
           >
-            {RECURRENCE_PRESETS.map((r, i) => (
-              <option key={r.label} value={i}>
-                {r.label}
-              </option>
-            ))}
+            <option value="none">No repeat</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
           </select>
+          {recFreq !== "none" && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-muted-foreground">every</span>
+              <input
+                type="number"
+                min={1}
+                max={365}
+                value={recInterval}
+                onChange={(e) => setRecInterval(Math.max(1, parseInt(e.target.value) || 1))}
+                className="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm outline-none"
+              />
+              <span className="text-xs text-muted-foreground">
+                {recFreq === "daily" ? (recInterval === 1 ? "day" : "days") :
+                 recFreq === "weekly" ? (recInterval === 1 ? "week" : "weeks") :
+                 recInterval === 1 ? "month" : "months"}
+              </span>
+            </div>
+          )}
         </Field>
 
         <Field label="Tags">
