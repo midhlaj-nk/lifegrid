@@ -11,6 +11,7 @@ import { MobileBottomNav } from "./mobile-nav";
 import { PageTransition } from "./page-transition";
 import { TaskPaneProvider } from "@/components/tasks/task-pane";
 import { CommandPalette } from "./command-palette";
+import { ShortcutsHelp } from "./shortcuts-help";
 import { cn } from "@/lib/utils";
 
 interface AppShellProps {
@@ -37,8 +38,19 @@ function ThemeToggle() {
 }
 
 export function AppShell({ areas, projects, tags, userName, overdueCount, children }: AppShellProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("sidebar-open") !== "false";
+  });
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  function toggleSidebar() {
+    setSidebarOpen((v) => {
+      const next = !v;
+      localStorage.setItem("sidebar-open", String(next));
+      return next;
+    });
+  }
   const pathname = usePathname();
   // wide canvases need the full viewport
   const fullWidth = pathname.startsWith("/sheets/") || pathname.startsWith("/apps") || pathname.startsWith("/notes/");
@@ -112,7 +124,7 @@ export function AppShell({ areas, projects, tags, userName, overdueCount, childr
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-12 items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur md:px-5">
           <button
-            onClick={() => setSidebarOpen((v) => !v)}
+            onClick={toggleSidebar}
             className="hidden rounded-md p-1.5 text-muted-foreground hover:bg-accent md:block"
             aria-label="Toggle sidebar"
           >
@@ -165,6 +177,7 @@ export function AppShell({ areas, projects, tags, userName, overdueCount, childr
           <PageTransition className={cn("mx-auto w-full", fullWidth ? "max-w-none" : "max-w-3xl")}>
             <TaskPaneProvider tags={tags} projects={projects} areas={areas}>
               <CommandPalette />
+              <ShortcutsHelp />
               {children}
             </TaskPaneProvider>
           </PageTransition>
