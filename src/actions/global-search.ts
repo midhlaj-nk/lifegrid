@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { notes, sheets, tasks } from "@/db/schema";
 import { requireUser } from "@/lib/session";
 import { getTaskById } from "@/lib/queries";
-import { and, eq, like, or } from "drizzle-orm";
+import { and, desc, eq, like, or } from "drizzle-orm";
 
 export type SearchResult = {
   id: string;
@@ -17,6 +17,40 @@ export type SearchResult = {
 export async function fetchTaskForPane(id: string) {
   const user = await requireUser();
   return getTaskById(user.id, id);
+}
+
+/** Recent items shown when palette opens with no query. */
+export async function getRecentItems(): Promise<SearchResult[]> {
+  const user = await requireUser();
+  const [recentNotes, recentSheets] = await Promise.all([
+    db
+      .select({ id: notes.id, title: notes.title, icon: notes.icon })
+      .from(notes)
+      .where(eq(notes.userId, user.id))
+      .orderBy(desc(notes.updatedAt))
+      .limit(4),
+    db
+      .select({ id: sheets.id, title: sheets.name })
+      .from(sheets)
+      .where(eq(sheets.userId, user.id))
+      .orderBy(desc(sheets.updatedAt))
+      .limit(2),
+  ]);
+  return [
+    ...recentNotes.map((r) => ({
+      id: r.id,
+      type: "note" as const,
+      title: r.title,
+      url: `/notes/${r.id}`,
+      icon: r.icon,
+    })),
+    ...recentSheets.map((r) => ({
+      id: r.id,
+      type: "sheet" as const,
+      title: r.title,
+      url: `/sheets/${r.id}`,
+    })),
+  ];
 }
 
 export async function globalSearch(query: string): Promise<SearchResult[]> {

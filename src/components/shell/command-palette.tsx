@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import { FileText, Search, Sheet, CheckSquare, Loader2 } from "lucide-react";
-import { globalSearch, fetchTaskForPane, type SearchResult } from "@/actions/global-search";
+import { globalSearch, getRecentItems, fetchTaskForPane, type SearchResult } from "@/actions/global-search";
 import { useTaskPane } from "@/components/tasks/task-pane";
 import { cn } from "@/lib/utils";
 
@@ -22,10 +22,15 @@ function Palette({ onClose }: { onClose: () => void }) {
   const [active, setActive] = useState(0);
   const [pending, startTransition] = useTransition();
   const inputRef = useRef<HTMLInputElement>(null);
+  const [recentItems, setRecentItems] = useState<SearchResult[]>([]);
 
   useEffect(() => {
     inputRef.current?.focus();
+    // Load recent items in background
+    getRecentItems().then(setRecentItems).catch(() => {});
   }, []);
+
+  const displayResults = query.trim() ? results : recentItems;
 
   useEffect(() => {
     if (!query.trim()) {
@@ -63,12 +68,12 @@ function Palette({ onClose }: { onClose: () => void }) {
   function onKey(e: React.KeyboardEvent) {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActive((i) => Math.min(i + 1, results.length - 1));
+      setActive((i) => Math.min(i + 1, displayResults.length - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActive((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter") {
-      const r = results[active];
+      const r = displayResults[active];
       if (r) go(r);
     } else if (e.key === "Escape") {
       onClose();
@@ -104,9 +109,14 @@ function Palette({ onClose }: { onClose: () => void }) {
         </div>
 
         {/* results */}
-        {results.length > 0 && (
+        {displayResults.length > 0 && (
           <ul className="max-h-72 overflow-y-auto py-1.5">
-            {results.map((r, i) => {
+            {!query.trim() && (
+              <li className="px-4 py-1.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+                Recent
+              </li>
+            )}
+            {displayResults.map((r, i) => {
               const Icon = TYPE_ICON[r.type];
               return (
                 <li key={r.id}>
@@ -140,7 +150,7 @@ function Palette({ onClose }: { onClose: () => void }) {
           </p>
         )}
 
-        {!query.trim() && (
+        {!query.trim() && recentItems.length === 0 && (
           <p className="px-4 py-4 text-xs text-muted-foreground">
             Type to search across tasks, notes, and sheets.
           </p>
