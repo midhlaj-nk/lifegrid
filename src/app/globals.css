@@ -4,6 +4,47 @@
 /* touch devices have no hover — actions hidden behind group-hover use touch:block */
 @custom-variant touch (@media (pointer: coarse));
 
+/* ── Native mobile feel ─────────────────────────────────────────────────── */
+
+/* 1. Kill the blue tap flash on every element */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 2. touch-action: manipulation removes ~300ms tap delay on buttons/links */
+button, a, [role="button"], label {
+  touch-action: manipulation;
+}
+
+/* 3. Prevent text selection on interactive elements (feels native) */
+button, a, [role="button"], nav, .select-none {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 4. Momentum scroll everywhere on iOS */
+html {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 5. iOS auto-zoom prevention — inputs must be ≥ 16px on mobile */
+@media (max-width: 767px) {
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+/* 6. Overscroll rubber-band only at the outermost layer, not nested */
+body {
+  overscroll-behavior-y: contain;
+}
+
+/* 7. Smooth momentum for all scrollable containers */
+.overflow-y-auto, .overflow-x-auto, .overflow-auto {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
 /* Safe-area utility for iPhone notch/home indicator — only mobile (md = 768px) */
 .pb-safe-nav {
   padding-bottom: max(6rem, calc(4rem + env(safe-area-inset-bottom)));
@@ -168,6 +209,14 @@ body {
   from { opacity: 0; transform: translateX(12px); }
   to   { opacity: 1; transform: translateX(0); }
 }
+@keyframes page-enter-mobile {
+  from { opacity: 0; transform: translateX(16px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes page-enter-desktop {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 
 /* ── Animation utilities ── */
 .animate-fade-in    { animation: fade-in    0.18s ease both; }
@@ -176,6 +225,16 @@ body {
 .animate-scale-in   { animation: scale-in   0.18s ease both; }
 .animate-slide-in-right { animation: slide-in-right 0.20s ease both; }
 
+/* ── Page transition — slides from right on mobile, fades up on desktop ── */
+.page-enter {
+  animation: page-enter-mobile 0.20s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+@media (min-width: 768px) {
+  .page-enter {
+    animation: page-enter-desktop 0.20s ease both;
+  }
+}
+
 /* ── Global interactive transitions ── */
 button, a, input, select, textarea {
   transition-property: color, background-color, border-color, box-shadow, opacity, transform;
@@ -183,9 +242,6 @@ button, a, input, select, textarea {
   transition-timing-function: ease;
 }
 button:active:not(:disabled) { transform: scale(0.97); }
-
-/* ── Page content enter (PageTransition component handles re-nav) ── */
-.animate-fade-up { animation: fade-up 0.22s ease both; }
 
 /* ── Smooth theme/color transitions on root ── */
 html {

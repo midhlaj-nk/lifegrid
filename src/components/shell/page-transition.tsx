@@ -13,17 +13,19 @@ export function PageTransition({
 }) {
   const pathname = usePathname();
   const ref = useRef<HTMLDivElement>(null);
+  const prevPath = useRef(pathname);
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
-    el.classList.remove("animate-fade-up");
-    void el.offsetHeight; // force reflow so browser re-fires the animation
-    el.classList.add("animate-fade-up");
+    if (!el || prevPath.current === pathname) return;
+    prevPath.current = pathname;
+    el.classList.remove("page-enter");
+    void el.offsetHeight;
+    el.classList.add("page-enter");
   }, [pathname]);
 
   return (
-    <div ref={ref} className={cn("animate-fade-up", className)}>
+    <div ref={ref} className={cn("page-enter", className)}>
       {children}
     </div>
   );
