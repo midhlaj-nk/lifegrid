@@ -24,7 +24,7 @@ import 'widgets/bottom_nav.dart';
 
 final isAuthenticatedProvider = Provider<bool>((ref) {
   final authState = ref.watch(authStateProvider);
-  return authState.value != null;
+  return authState.valueOrNull != null;
 });
 
 final _routerProvider = Provider<GoRouter>((ref) {

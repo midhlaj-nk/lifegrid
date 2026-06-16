@@ -8,6 +8,12 @@ import { count, eq } from "drizzle-orm";
 
 export const auth = betterAuth({
   plugins: [bearer()],
+  trustedOrigins: [
+    "https://lifegrid-omega.vercel.app",
+    "app://lifeos",
+    "http://localhost:3000",
+    "http://10.0.2.2:3000",
+  ],
   database: drizzleAdapter(db, {
     provider: "sqlite",
     schema: {
