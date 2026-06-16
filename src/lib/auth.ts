@@ -1,11 +1,13 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { bearer } from "better-auth/plugins";
 import { APIError } from "better-auth/api";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { count, eq } from "drizzle-orm";
 
 export const auth = betterAuth({
+  plugins: [bearer()],
   database: drizzleAdapter(db, {
     provider: "sqlite",
     schema: {

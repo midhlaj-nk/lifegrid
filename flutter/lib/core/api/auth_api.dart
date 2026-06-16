@@ -21,19 +21,27 @@ class AuthApi {
         },
       ),
     );
-    return response.data as Map<String, dynamic>;
+    final data = response.data as Map<String, dynamic>;
+    // Better Auth returns token in the response body — store it for Bearer auth
+    final token = data['token'] as String?;
+    if (token != null) await _client.setAuthToken(token);
+    return data;
   }
 
   Future<void> signOut() async {
-    await _client.rawDio.post(
-      '$kAuthBase/sign-out',
-      options: Options(
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      ),
-    );
+    try {
+      await _client.rawDio.post(
+        '$kAuthBase/sign-out',
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+        ),
+      );
+    } finally {
+      await _client.setAuthToken(null);
+    }
   }
 
   Future<Map<String, dynamic>> signUp(
