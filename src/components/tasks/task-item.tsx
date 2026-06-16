@@ -39,6 +39,7 @@ export function TaskItem({ task }: { task: TaskWithMeta }) {
   const [subtaskTitle, setSubtaskTitle] = useState("");
   // optimistic done state — flips instantly, server catches up
   const [optimisticDone, setOptimisticDone] = useState<boolean | null>(null);
+  const [popped, setPopped] = useState(false);
   const confirm = useConfirm();
   const openTask = useTaskPane();
 
@@ -50,6 +51,8 @@ export function TaskItem({ task }: { task: TaskWithMeta }) {
 
   function toggle() {
     setOptimisticDone(!done);
+    setPopped(true);
+    setTimeout(() => setPopped(false), 350);
     startTransition(async () => {
       await toggleTaskDone(task.id);
       setOptimisticDone(null);
@@ -76,9 +79,8 @@ export function TaskItem({ task }: { task: TaskWithMeta }) {
           aria-label={done ? "Mark not done" : "Mark done"}
           className={cn(
             "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors touch:h-6 touch:w-6",
-            done
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-muted-foreground/40 hover:border-primary"
+            done ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/40 hover:border-primary",
+            popped && "checkbox-pop"
           )}
         >
           {done && <Check className="h-3 w-3" strokeWidth={3} />}

@@ -96,8 +96,10 @@ export function TaskList({
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
       <SortableContext items={tasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
         <div className="space-y-0.5">
-          {tasks.map((t) => (
-            <SortableTaskItem key={t.id} task={t} />
+          {tasks.map((t, i) => (
+            <div key={t.id} className="list-item-enter" style={{ "--i": i } as React.CSSProperties}>
+              <SortableTaskItem task={t} />
+            </div>
           ))}
         </div>
       </SortableContext>

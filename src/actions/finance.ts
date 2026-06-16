@@ -39,6 +39,19 @@ const DEFAULT_CATEGORIES: { name: string; icon: string; kind: "expense" | "incom
   { name: "Other income", icon: "💰", kind: "income" },
 ];
 
+export async function getQuickFinanceData() {
+  const user = await requireUser();
+  const [accounts, categories] = await Promise.all([
+    db.select({ id: finAccounts.id, name: finAccounts.name })
+      .from(finAccounts)
+      .where(eq(finAccounts.userId, user.id)),
+    db.select({ id: finCategories.id, name: finCategories.name, icon: finCategories.icon, kind: finCategories.kind })
+      .from(finCategories)
+      .where(eq(finCategories.userId, user.id)),
+  ]);
+  return { accounts, categories };
+}
+
 export async function ensureDefaultCategories() {
   const user = await requireUser();
   const existing = await db
