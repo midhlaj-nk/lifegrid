@@ -152,6 +152,15 @@ export async function reorderTasks(orderedIds: string[]) {
   );
 }
 
+export async function setTaskDueDate(id: string, date: string | null) {
+  const user = await requireUser();
+  await db
+    .update(tasks)
+    .set({ dueDate: date, updatedAt: new Date() })
+    .where(and(eq(tasks.id, id), eq(tasks.userId, user.id)));
+  revalidateTaskViews();
+}
+
 /** Move a task into a kanban column. "done" completes; others reopen. */
 export async function setTaskKanbanColumn(id: string, column: string) {
   const user = await requireUser();

@@ -1,5 +1,5 @@
-const STATIC_CACHE = "lifeos-static-v2";
-const PAGE_CACHE = "lifeos-pages-v2";
+const STATIC_CACHE = "lifeos-static-v3";
+const PAGE_CACHE = "lifeos-pages-v3";
 const OFFLINE_URL = "/offline";
 
 self.addEventListener("install", (event) => {
@@ -70,4 +70,35 @@ self.addEventListener("fetch", (event) => {
       })()
     );
   }
+});
+
+// Push notification received from server
+self.addEventListener("push", (event) => {
+  let data = { title: "Life Grid", body: "You have a reminder.", url: "/today" };
+  try { data = { ...data, ...event.data.json() }; } catch {}
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      tag: data.url,
+      data: { url: data.url },
+    })
+  );
+});
+
+// Tap on notification → open/focus the app
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const target = event.notification.data?.url ?? "/today";
+  event.waitUntil(
+    clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((list) => {
+        for (const client of list) {
+          if (client.url.includes(target) && "focus" in client) return client.focus();
+        }
+        return clients.openWindow(target);
+      })
+  );
 });

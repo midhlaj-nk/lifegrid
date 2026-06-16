@@ -57,7 +57,7 @@ export default async function AppLayout({
       overdueCount={overdueCount}
     >
       {children}
-      <GlobalQuickAdd />
+      <GlobalQuickAdd tags={tags} projects={projects} />
       <ReminderWatcher
         tasks={dueSoon as { id: string; title: string; dueDate: string; dueTime: string }[]}
       />

@@ -49,7 +49,7 @@ export function SidePane({
           <Drawer.Content className="fixed inset-x-0 bottom-0 z-[91] flex max-h-[92dvh] flex-col rounded-t-2xl border-t border-border bg-background shadow-2xl outline-none">
             {/* drag handle */}
             <div className="flex justify-center pt-3 pb-1 shrink-0">
-              <div className="h-1.5 w-12 rounded-full bg-border/80" />
+              <div className="h-2.5 w-20 rounded-full bg-border/80" />
             </div>
             {/* header */}
             <div className="flex shrink-0 items-center justify-between border-b border-border px-4 py-3">

@@ -10,8 +10,10 @@ import { Sidebar } from "./sidebar";
 import { MobileBottomNav } from "./mobile-nav";
 import { PageTransition } from "./page-transition";
 import { TaskPaneProvider } from "@/components/tasks/task-pane";
-import { CommandPalette } from "./command-palette";
-import { ShortcutsHelp } from "./shortcuts-help";
+import dynamic from "next/dynamic";
+
+const CommandPalette = dynamic(() => import("./command-palette").then((m) => m.CommandPalette), { ssr: false });
+const ShortcutsHelp = dynamic(() => import("./shortcuts-help").then((m) => m.ShortcutsHelp), { ssr: false });
 import { cn } from "@/lib/utils";
 
 interface AppShellProps {
@@ -57,6 +59,12 @@ export function AppShell({ areas, projects, tags, userName, overdueCount, childr
 
   return (
     <div className="flex min-h-dvh">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:m-3 focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:text-primary-foreground"
+      >
+        Skip to main content
+      </a>
       {/* Desktop / tablet sidebar */}
       <aside
         className={cn(
@@ -82,7 +90,7 @@ export function AppShell({ areas, projects, tags, userName, overdueCount, childr
 
       {/* Mobile drawer */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden" onClick={() => setMobileOpen(false)}>
+        <div className="fixed inset-0 z-50 md:hidden" role="presentation" onClick={() => setMobileOpen(false)}>
           <div className="absolute inset-0 bg-black/50" />
           <div
             className="absolute inset-y-0 left-0 w-72 border-r border-border bg-background"
@@ -169,7 +177,7 @@ export function AppShell({ areas, projects, tags, userName, overdueCount, childr
             {userName}
           </span>
         </header>
-        <main className="pb-safe-nav flex-1 px-4 pt-5 md:px-8 md:pb-8">
+        <main id="main-content" className="pb-safe-nav flex-1 px-4 pt-5 md:px-8 md:pb-8">
           <PageTransition className={cn("mx-auto w-full", fullWidth ? "max-w-none" : "max-w-3xl")}>
             <TaskPaneProvider tags={tags} projects={projects} areas={areas}>
               <CommandPalette />

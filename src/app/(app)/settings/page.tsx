@@ -11,6 +11,7 @@ import { VaultResetForm } from "./vault-reset-form";
 import { AdminSettings } from "./admin-settings";
 import { SettingsShell } from "./settings-shell";
 import { ShortcutsSettings } from "./shortcuts-settings";
+import { PushSetup } from "@/components/shell/push-setup";
 import { getTokenForUser, createTokenForUser } from "@/lib/api-tokens";
 
 export default async function SettingsPage() {
@@ -56,6 +57,15 @@ export default async function SettingsPage() {
         <div className="rounded-xl border border-border p-5">
           <AppearanceForm />
         </div>
+      </div>
+    ),
+    notifications: (
+      <div>
+        <h2 className="mb-1 text-base font-semibold">Notifications</h2>
+        <p className="mb-6 text-xs text-muted-foreground">
+          Push notifications for task reminders — works even when the app is closed.
+        </p>
+        <PushSetup />
       </div>
     ),
     ai: (

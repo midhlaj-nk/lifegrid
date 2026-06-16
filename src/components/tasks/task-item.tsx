@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { format, isPast, isToday, parseISO } from "date-fns";
+import { useState, useTransition, useRef, useCallback } from "react";
+import { format, isPast, isToday, parseISO, addDays } from "date-fns";
 import {
   Check,
   ChevronDown,
@@ -11,12 +11,14 @@ import {
   Plus,
   Repeat,
   Trash2,
+  CalendarArrowUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   toggleTaskDone,
   deleteTask,
   createTask,
+  setTaskDueDate,
 } from "@/actions/tasks";
 import {
   parseRecurrence,
@@ -32,14 +34,20 @@ const PRIORITY_COLOR: Record<number, string> = {
   3: "text-blue-500",
 };
 
+const SWIPE_THRESHOLD = 60;
+const SWIPE_COMMIT = 120;
+
 export function TaskItem({ task }: { task: TaskWithMeta }) {
   const [pending, startTransition] = useTransition();
   const [expanded, setExpanded] = useState(false);
   const [addingSubtask, setAddingSubtask] = useState(false);
   const [subtaskTitle, setSubtaskTitle] = useState("");
-  // optimistic done state — flips instantly, server catches up
   const [optimisticDone, setOptimisticDone] = useState<boolean | null>(null);
   const [popped, setPopped] = useState(false);
+  // swipe state
+  const [swipeX, setSwipeX] = useState(0);
+  const [swiping, setSwiping] = useState(false);
+  const touchStart = useRef<number | null>(null);
   const confirm = useConfirm();
   const openTask = useTaskPane();
 
@@ -71,9 +79,87 @@ export function TaskItem({ task }: { task: TaskWithMeta }) {
     if (ok) startTransition(() => deleteTask(task.id));
   }
 
+  function reschedule(days: number) {
+    const base = task.dueDate ? parseISO(task.dueDate) : new Date();
+    const next = format(addDays(base, days), "yyyy-MM-dd");
+    startTransition(() => setTaskDueDate(task.id, next));
+    setSwipeX(0);
+  }
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStart.current = e.touches[0].clientX;
+  }, []);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (touchStart.current === null) return;
+    const dx = e.touches[0].clientX - touchStart.current;
+    if (Math.abs(dx) > 8) setSwiping(true);
+    setSwipeX(Math.max(-160, Math.min(160, dx)));
+  }, []);
+
+  const toggleRef = useRef(toggle);
+  toggleRef.current = toggle;
+
+  const onTouchEnd = useCallback(() => {
+    if (swipeX >= SWIPE_COMMIT) {
+      toggleRef.current();
+      setSwipeX(0);
+    } else if (swipeX <= -SWIPE_COMMIT) {
+      setSwipeX(-140);
+    } else {
+      setSwipeX(0);
+    }
+    touchStart.current = null;
+    setSwiping(false);
+  }, [swipeX]);
+
+  const showRightStrip = swipeX > SWIPE_THRESHOLD;
+
   return (
     <div className="group">
-      <div className="flex items-start gap-2.5 rounded-lg px-2 py-2.5 transition-colors hover:bg-accent/50">
+      {/* swipe row wrapper — overflow hidden so strips don't bleed */}
+      <div className="relative overflow-hidden rounded-lg">
+        {/* right strip — complete (swipe right) */}
+        <div
+          className={cn(
+            "absolute inset-y-0 left-0 flex items-center justify-start px-4 bg-green-500 transition-opacity",
+            showRightStrip ? "opacity-100" : "opacity-0"
+          )}
+          style={{ width: Math.max(0, swipeX) }}
+        >
+          <Check className="h-5 w-5 text-white" strokeWidth={2.5} />
+        </div>
+        {/* left strip — reschedule / delete (swipe left) */}
+        <div
+          className="absolute inset-y-0 right-0 flex items-stretch"
+          style={{ width: Math.max(0, -swipeX) }}
+        >
+          <button
+            onPointerDown={(e) => { e.stopPropagation(); reschedule(1); }}
+            className="flex flex-1 flex-col items-center justify-center gap-0.5 bg-blue-500 text-white text-xs font-medium min-w-[70px]"
+          >
+            <CalendarArrowUp className="h-4 w-4" />
+            Tomorrow
+          </button>
+          <button
+            onPointerDown={(e) => { e.stopPropagation(); setSwipeX(0); startTransition(() => deleteTask(task.id)); }}
+            className="flex flex-col items-center justify-center gap-0.5 bg-red-500 text-white text-xs font-medium min-w-[70px]"
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete
+          </button>
+        </div>
+        <div
+          className="flex items-start gap-2.5 px-2 py-2.5 transition-colors hover:bg-accent/50 bg-background"
+          style={{
+            transform: `translateX(${swipeX}px)`,
+            transition: swiping ? "none" : "transform 0.25s ease",
+          }}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+          onClick={swipeX !== 0 ? (e) => { e.preventDefault(); setSwipeX(0); } : undefined}
+        >
         <button
           onClick={toggle}
           aria-label={done ? "Mark not done" : "Mark done"}
@@ -175,24 +261,25 @@ export function TaskItem({ task }: { task: TaskWithMeta }) {
               setAddingSubtask(true);
             }}
             aria-label="Add subtask"
-            className="rounded p-0.5 text-muted-foreground hover:text-foreground touch:p-1"
+            className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:text-foreground touch:h-9 touch:w-9"
           >
             <Plus className="h-4 w-4" />
           </button>
           <button
             onClick={() => openTask(task)}
             aria-label="Edit task"
-            className="rounded p-0.5 text-muted-foreground hover:text-foreground touch:p-1"
+            className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:text-foreground touch:h-9 touch:w-9"
           >
             <Pencil className="h-4 w-4" />
           </button>
           <button
             onClick={remove}
             aria-label="Delete task"
-            className="rounded p-0.5 text-muted-foreground hover:text-red-500 touch:p-1"
+            className="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:text-red-500 touch:h-9 touch:w-9"
           >
             <Trash2 className="h-4 w-4" />
           </button>
+        </div>
         </div>
       </div>
 

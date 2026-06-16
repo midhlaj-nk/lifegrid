@@ -53,10 +53,24 @@ async function attachMeta(
 
   const projectById = new Map(projectRows.map((p) => [p.id, p]));
 
+  const tagsByTask = new Map<string, TagRow[]>();
+  for (const l of tagLinks) {
+    const arr = tagsByTask.get(l.taskId) ?? [];
+    arr.push(l.tag);
+    tagsByTask.set(l.taskId, arr);
+  }
+  const subtasksByParent = new Map<string, TaskRow[]>();
+  for (const s of subtaskRows) {
+    if (!s.parentId) continue;
+    const arr = subtasksByParent.get(s.parentId) ?? [];
+    arr.push(s);
+    subtasksByParent.set(s.parentId, arr);
+  }
+
   return parents.map((t) => ({
     ...t,
-    tags: tagLinks.filter((l) => l.taskId === t.id).map((l) => l.tag),
-    subtasks: subtaskRows.filter((s) => s.parentId === t.id),
+    tags: tagsByTask.get(t.id) ?? [],
+    subtasks: subtasksByParent.get(t.id) ?? [],
     projectName: t.projectId
       ? (projectById.get(t.projectId)?.name ?? null)
       : null,

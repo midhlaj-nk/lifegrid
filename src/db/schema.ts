@@ -473,6 +473,17 @@ export const repoMappings = sqliteTable("repo_mappings", {
   updatedAt: tsNow("updated_at").notNull(),
 });
 
+export const pushSubscriptions = sqliteTable("push_subscriptions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  endpoint: text("endpoint").notNull().unique(),
+  p256dh: text("p256dh").notNull(),
+  auth: text("auth").notNull(),
+  createdAt: tsNow("created_at").notNull(),
+});
+
 export const taskTags = sqliteTable(
   "task_tags",
   {

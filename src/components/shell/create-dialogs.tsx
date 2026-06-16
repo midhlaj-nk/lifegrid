@@ -76,7 +76,7 @@ export function CreateAreaDialog({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <span onClick={() => setOpen(true)}>{children}</span>
+      <button type="button" onClick={() => setOpen(true)} className="contents">{children}</button>
       <Modal open={open} onClose={() => setOpen(false)} title="New area">
         <form
           onSubmit={(e) => {
@@ -291,7 +291,7 @@ export function CreateProjectDialog({
 
   return (
     <>
-      <span onClick={() => setOpen(true)}>{children}</span>
+      <button type="button" onClick={() => setOpen(true)} className="contents">{children}</button>
       <Modal open={open} onClose={() => setOpen(false)} title="New project">
         <form
           onSubmit={(e) => {

@@ -1,17 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { Brush, Brain, LockKeyhole, ShieldCheck, Tag, User, Smartphone } from "lucide-react";
+import { Bell, Brush, Brain, LockKeyhole, ShieldCheck, Tag, User, Smartphone } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { key: "account",    label: "Account",    icon: User        },
-  { key: "appearance", label: "Appearance", icon: Brush       },
-  { key: "ai",         label: "AI",         icon: Brain       },
-  { key: "tags",       label: "Tags",       icon: Tag         },
-  { key: "vault",      label: "Vault",      icon: LockKeyhole },
-  { key: "shortcuts",  label: "Shortcuts",  icon: Smartphone  },
-  { key: "admin",      label: "Admin",      icon: ShieldCheck },
+  { key: "account",       label: "Account",       icon: User        },
+  { key: "appearance",    label: "Appearance",    icon: Brush       },
+  { key: "notifications", label: "Notifications", icon: Bell        },
+  { key: "ai",            label: "AI",            icon: Brain       },
+  { key: "tags",          label: "Tags",          icon: Tag         },
+  { key: "vault",         label: "Vault",         icon: LockKeyhole },
+  { key: "shortcuts",     label: "Shortcuts",     icon: Smartphone  },
+  { key: "admin",         label: "Admin",         icon: ShieldCheck },
 ] as const;
 
 type SectionKey = (typeof NAV)[number]["key"];

@@ -29,9 +29,21 @@ export async function getAccountsWithBalances(userId: string) {
       .where(eq(finTransactions.userId, userId)),
   ]);
 
+  const txsByAccount = new Map<string, typeof txs>();
+  for (const t of txs) {
+    const fromArr = txsByAccount.get(t.accountId) ?? [];
+    fromArr.push(t);
+    txsByAccount.set(t.accountId, fromArr);
+    if (t.type === "transfer" && t.transferToAccountId) {
+      const toArr = txsByAccount.get(t.transferToAccountId) ?? [];
+      toArr.push(t);
+      txsByAccount.set(t.transferToAccountId, toArr);
+    }
+  }
+
   return accounts.map((a) => {
     let bal = a.openingBalanceMinor;
-    for (const t of txs) {
+    for (const t of txsByAccount.get(a.id) ?? []) {
       if (t.accountId === a.id) {
         if (t.type === "expense") bal -= t.amountMinor;
         else if (t.type === "income") bal += t.amountMinor;

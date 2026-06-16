@@ -102,8 +102,9 @@ export function MobileBottomNav({ onMenu }: { onMenu: () => void }) {
                 key={item.href}
                 href={item.href}
                 onClick={() => setFabOpen(false)}
-                className={cn(
-                  "flex flex-1 flex-col items-center justify-center gap-0.5 py-3 text-[10px] font-medium transition-colors",
+                aria-current={active ? "page" : undefined}
+              className={cn(
+                  "flex flex-1 flex-col items-center justify-center gap-0.5 py-4 text-[10px] font-medium transition-colors active:bg-accent/50",
                   active ? "text-primary" : "text-muted-foreground"
                 )}
               >
@@ -153,7 +154,7 @@ function SpeedDialOption({
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-2 rounded-full border border-border bg-background/95 px-3.5 py-2 text-sm font-medium shadow-lg backdrop-blur transition-all duration-200",
+        "flex items-center gap-2 rounded-full border border-border bg-background/95 px-4 py-3 text-sm font-medium shadow-lg backdrop-blur transition-all duration-200",
         visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
       )}
       style={{ transitionDelay: visible ? `${delay}ms` : "0ms" }}

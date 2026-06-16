@@ -244,13 +244,13 @@ function TaskDetail({
             type="date"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
-            className="h-8 rounded-md border border-input bg-background px-2 outline-none"
+            className="h-10 rounded-md border border-input bg-background px-2 outline-none"
           />
           <input
             type="time"
             value={dueTime}
             onChange={(e) => setDueTime(e.target.value)}
-            className="h-8 rounded-md border border-input bg-background px-2 outline-none"
+            className="h-10 rounded-md border border-input bg-background px-2 outline-none"
           />
         </Field>
 
@@ -258,7 +258,7 @@ function TaskDetail({
           <select
             value={projectId}
             onChange={(e) => setProjectId(e.target.value)}
-            className="h-8 rounded-md border border-input bg-background px-2 outline-none"
+            className="h-10 rounded-md border border-input bg-background px-2 outline-none"
           >
             <option value="">None</option>
             {projects.map((p) => (
@@ -273,7 +273,7 @@ function TaskDetail({
           <select
             value={areaId}
             onChange={(e) => setAreaId(e.target.value)}
-            className="h-8 rounded-md border border-input bg-background px-2 outline-none"
+            className="h-10 rounded-md border border-input bg-background px-2 outline-none"
           >
             <option value="">None</option>
             {areas.map((a) => (
@@ -288,7 +288,7 @@ function TaskDetail({
           <select
             value={priority}
             onChange={(e) => setPriority(Number(e.target.value))}
-            className="h-8 rounded-md border border-input bg-background px-2 outline-none"
+            className="h-10 rounded-md border border-input bg-background px-2 outline-none"
           >
             <option value={1}>P1 — urgent</option>
             <option value={2}>P2 — high</option>
@@ -312,7 +312,7 @@ function TaskDetail({
           <select
             value={recFreq}
             onChange={(e) => setRecFreq(e.target.value as "none" | "daily" | "weekly" | "monthly")}
-            className="h-8 rounded-md border border-input bg-background px-2 outline-none"
+            className="h-10 rounded-md border border-input bg-background px-2 outline-none"
           >
             <option value="none">No repeat</option>
             <option value="daily">Daily</option>

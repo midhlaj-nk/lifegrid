@@ -91,7 +91,7 @@ export function QuickTransactionSheet({
             <div className="h-1.5 w-12 rounded-full bg-border/80" />
           </div>
 
-          <form onSubmit={submit} className="flex flex-col gap-4 px-5 pb-8 pt-3">
+          <form onSubmit={submit} className="flex flex-col gap-4 px-5 pb-safe-nav pt-3" style={{ paddingBottom: "max(2rem, env(safe-area-inset-bottom) + 1rem)" }}>
             {/* Header */}
             <div className="flex items-center justify-between">
               <h2 className="text-base font-semibold">Quick transaction</h2>
@@ -123,6 +123,7 @@ export function QuickTransactionSheet({
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0.00"
+                aria-label="Amount"
                 className="h-16 w-full rounded-xl border border-input bg-background pl-10 pr-4 text-3xl font-semibold outline-none focus:ring-2 focus:ring-ring"
               />
             </div>
@@ -168,7 +169,8 @@ export function QuickTransactionSheet({
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Note (optional)"
-                className="flex-1 rounded-xl border border-input bg-background px-3 py-2.5 text-sm outline-none"
+                aria-label="Note"
+                className="flex-1 rounded-xl border border-input bg-background px-3 py-3 text-sm outline-none"
               />
             </div>
 

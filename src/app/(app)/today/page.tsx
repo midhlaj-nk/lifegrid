@@ -22,13 +22,34 @@ export default async function TodayPage() {
       format(t.completedAt, "yyyy-MM-dd") === today
   );
 
+  const todayTotal = dueToday.length + doneToday.filter((t) => t.dueDate === today).length;
+  const todayDone = doneToday.filter((t) => t.dueDate === today).length;
+  const pct = todayTotal > 0 ? Math.round((todayDone / todayTotal) * 100) : 0;
+
   return (
     <div className="space-y-6">
-      <header>
-        <h1 className="text-xl font-semibold tracking-tight">Today</h1>
-        <p className="text-sm text-muted-foreground">
-          {format(new Date(), "EEEE, d MMMM")}
-        </p>
+      <header className="space-y-2">
+        <div className="flex items-end justify-between">
+          <div>
+            <h1 className="text-xl font-semibold tracking-tight">Today</h1>
+            <p className="text-sm text-muted-foreground">
+              {format(new Date(), "EEEE, d MMMM")}
+            </p>
+          </div>
+          {todayTotal > 0 && (
+            <span className="text-sm text-muted-foreground">
+              {todayDone}/{todayTotal}
+            </span>
+          )}
+        </div>
+        {todayTotal > 0 && (
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary transition-all duration-500"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+        )}
       </header>
 
       <QuickAdd defaultDueDate={today} projects={projects} />

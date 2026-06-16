@@ -17,7 +17,8 @@ export default async function NotesPage() {
     })
     .from(notes)
     .where(eq(notes.userId, user.id))
-    .orderBy(desc(notes.updatedAt));
+    .orderBy(desc(notes.updatedAt))
+    .limit(200);
 
   return (
     <NotesLanding
