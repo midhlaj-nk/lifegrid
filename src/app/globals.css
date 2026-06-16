@@ -27,10 +27,11 @@ html {
   -webkit-overflow-scrolling: touch;
 }
 
-/* 5. iOS auto-zoom prevention — inputs must be ≥ 16px on mobile */
+/* 5. iOS auto-zoom prevention — inputs must be ≥ 16px on mobile
+      !important needed: Tailwind text-xs/text-sm utilities have higher specificity */
 @media (max-width: 767px) {
   input, select, textarea {
-    font-size: 16px;
+    font-size: 16px !important;
   }
 }
 
@@ -43,6 +44,20 @@ body {
 .overflow-y-auto, .overflow-x-auto, .overflow-auto {
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+}
+
+/* 8. Minimum touch target: 44px per Apple HIG / 48px per Material
+      Use relative positioning so the pseudo-element expands the hit area
+      without affecting layout */
+@media (pointer: coarse) {
+  button, a, [role="button"] {
+    position: relative;
+  }
+  button::after, a::after, [role="button"]::after {
+    content: '';
+    position: absolute;
+    inset: min(0px, calc((44px - 100%) / 2));
+  }
 }
 
 /* Safe-area: bottom padding clears the tab bar (≈64px) + iPhone home indicator */
@@ -210,7 +225,7 @@ body {
   to   { opacity: 1; transform: translateX(0); }
 }
 @keyframes page-enter-mobile {
-  from { opacity: 0; transform: translateX(16px); }
+  from { opacity: 0; transform: translateX(14px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 @keyframes page-enter-desktop {

@@ -59,7 +59,7 @@ export function SidePane({
               <button
                 onClick={onClose}
                 aria-label="Close"
-                className="rounded-md p-2 text-muted-foreground hover:bg-accent active:scale-95"
+                className="rounded-md p-2.5 text-muted-foreground hover:bg-accent active:scale-95"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -129,7 +129,7 @@ function DesktopPane({
           <button
             onClick={onClose}
             aria-label="Close"
-            className="rounded-md p-1.5 text-muted-foreground hover:bg-accent"
+            className="rounded-md p-2.5 text-muted-foreground hover:bg-accent"
           >
             <X className="h-4 w-4" />
           </button>

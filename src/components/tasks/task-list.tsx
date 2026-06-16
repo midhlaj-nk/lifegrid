@@ -140,7 +140,7 @@ export function FilterableTaskList({
                 key={p ?? "all"}
                 onClick={() => setPriorityFilter(p)}
                 className={cn(
-                  "rounded-full px-2 py-0.5 text-xs transition-colors",
+                  "rounded-full px-2.5 py-1 text-xs transition-colors touch:min-h-[2.75rem] touch:px-3",
                   priorityFilter === p
                     ? "bg-primary text-primary-foreground"
                     : "border border-border text-muted-foreground hover:bg-accent"
@@ -157,7 +157,7 @@ export function FilterableTaskList({
                   key={tag.id}
                   onClick={() => setTagFilter(tagFilter === tag.id ? null : tag.id)}
                   className={cn(
-                    "rounded-full px-2 py-0.5 text-xs transition-colors",
+                    "rounded-full px-2.5 py-1 text-xs transition-colors touch:min-h-[2.75rem]",
                     tagFilter === tag.id
                       ? "border-2 bg-accent font-medium"
                       : "border border-border text-muted-foreground hover:bg-accent"
