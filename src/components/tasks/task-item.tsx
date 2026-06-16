@@ -70,12 +70,12 @@ export function TaskItem({ task }: { task: TaskWithMeta }) {
 
   return (
     <div className="group">
-      <div className="flex items-start gap-2.5 rounded-lg px-2 py-2 transition-colors hover:bg-accent/50">
+      <div className="flex items-start gap-2.5 rounded-lg px-2 py-2.5 transition-colors hover:bg-accent/50">
         <button
           onClick={toggle}
           aria-label={done ? "Mark not done" : "Mark done"}
           className={cn(
-            "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+            "mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors touch:h-6 touch:w-6",
             done
               ? "border-primary bg-primary text-primary-foreground"
               : "border-muted-foreground/40 hover:border-primary"
@@ -163,7 +163,7 @@ export function TaskItem({ task }: { task: TaskWithMeta }) {
 
         <div
           className={cn(
-            "mt-1 hidden gap-1 group-hover:flex touch:flex",
+            "mt-1 hidden gap-1.5 group-hover:flex touch:flex",
             pending && "flex opacity-50"
           )}
         >
@@ -173,23 +173,23 @@ export function TaskItem({ task }: { task: TaskWithMeta }) {
               setAddingSubtask(true);
             }}
             aria-label="Add subtask"
-            className="text-muted-foreground hover:text-foreground"
+            className="rounded p-0.5 text-muted-foreground hover:text-foreground touch:p-1"
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-4 w-4" />
           </button>
           <button
             onClick={() => openTask(task)}
             aria-label="Edit task"
-            className="text-muted-foreground hover:text-foreground"
+            className="rounded p-0.5 text-muted-foreground hover:text-foreground touch:p-1"
           >
-            <Pencil className="h-3.5 w-3.5" />
+            <Pencil className="h-4 w-4" />
           </button>
           <button
             onClick={remove}
             aria-label="Delete task"
-            className="text-muted-foreground hover:text-red-500"
+            className="rounded p-0.5 text-muted-foreground hover:text-red-500 touch:p-1"
           >
-            <Trash2 className="h-3.5 w-3.5" />
+            <Trash2 className="h-4 w-4" />
           </button>
         </div>
       </div>

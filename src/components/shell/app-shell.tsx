@@ -122,26 +122,22 @@ export function AppShell({ areas, projects, tags, userName, overdueCount, childr
 
       {/* Main */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-12 items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur md:px-5">
+        <header className="sticky top-0 z-30 hidden h-12 items-center gap-2 border-b border-border bg-background/95 px-3 backdrop-blur md:flex md:px-5">
           <button
             onClick={toggleSidebar}
-            className="hidden rounded-md p-1.5 text-muted-foreground hover:bg-accent md:block"
+            className="rounded-md p-1.5 text-muted-foreground hover:bg-accent"
             aria-label="Toggle sidebar"
           >
             <PanelLeft className="h-4 w-4" />
           </button>
           <Link
             href="/apps"
-            className="hidden rounded-md p-1.5 text-muted-foreground hover:bg-accent md:block"
+            className="rounded-md p-1.5 text-muted-foreground hover:bg-accent"
             aria-label="All apps"
           >
             <LayoutGrid className="h-4 w-4" />
           </Link>
-          <LogoMark iconSize={16} className="text-sm md:hidden" />
-          <div className="ml-auto flex items-center gap-1 md:hidden">
-            <ThemeToggle />
-          </div>
-          <div className="ml-auto hidden items-center gap-2 md:flex">
+          <div className="ml-auto flex items-center gap-2">
             <button
               onClick={() => {
                 document.dispatchEvent(
@@ -169,11 +165,11 @@ export function AppShell({ areas, projects, tags, userName, overdueCount, childr
               <kbd className="ml-1 rounded bg-muted px-1 py-0.5 text-[10px]">Q</kbd>
             </button>
           </div>
-          <span className="ml-2 hidden text-xs text-muted-foreground md:block">
+          <span className="ml-2 text-xs text-muted-foreground">
             {userName}
           </span>
         </header>
-        <main className="pb-safe-nav flex-1 px-3 pt-4 md:px-8 md:pb-8">
+        <main className="pb-safe-nav flex-1 px-4 pt-5 md:px-8 md:pb-8">
           <PageTransition className={cn("mx-auto w-full", fullWidth ? "max-w-none" : "max-w-3xl")}>
             <TaskPaneProvider tags={tags} projects={projects} areas={areas}>
               <CommandPalette />

@@ -42,15 +42,26 @@ export function SidePane({
           open ? "opacity-100" : "pointer-events-none opacity-0"
         )}
       />
-      {/* panel */}
+      {/* panel — bottom sheet on mobile, right pane on md+ */}
       <aside
         role="dialog"
         aria-modal="true"
         className={cn(
-          "fixed inset-y-0 right-0 z-[91] flex w-full max-w-md flex-col border-l border-border bg-background shadow-2xl transition-transform duration-200 ease-out",
-          open ? "translate-x-0" : "translate-x-full"
+          "fixed z-[91] flex flex-col bg-background shadow-2xl transition-transform duration-300 ease-out",
+          // mobile: bottom sheet
+          "inset-x-0 bottom-0 max-h-[92dvh] rounded-t-2xl border-t border-border",
+          // desktop: right side pane
+          "md:inset-y-0 md:right-0 md:bottom-auto md:max-h-full md:w-full md:max-w-md md:rounded-none md:border-l md:border-t-0",
+          // transform: mobile = slide up/down, desktop = slide left/right
+          open
+            ? "translate-y-0 md:translate-x-0"
+            : "translate-y-full md:translate-y-0 md:translate-x-full"
         )}
       >
+        {/* mobile drag indicator */}
+        <div className="flex justify-center pt-3 pb-1 md:hidden">
+          <div className="h-1 w-10 rounded-full bg-border" />
+        </div>
         <div className="flex items-center justify-between border-b border-border px-4 py-3">
           <div className="min-w-0 flex-1 text-sm font-medium text-muted-foreground">
             {title}
