@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_PATHS = ["/sign-in", "/sign-up", "/api/auth", "/api/v1"];
+const PUBLIC_PATHS = ["/sign-in", "/sign-up"];
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -23,7 +23,8 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
+  // Exclude all API routes from the proxy — they do their own auth
   matcher: [
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|manifest|icons|sw.js|offline|.*\\.(?:svg|png|jpg|webmanifest)).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|manifest|icons|sw.js|offline|.*\\.(?:svg|png|jpg|webmanifest)).*)",
   ],
 };
