@@ -5,6 +5,7 @@ import { AccentProvider } from "@/components/accent-provider";
 import { ConfirmProvider } from "@/components/ui/app-dialog";
 import { SwRegister } from "@/components/sw-register";
 import { Toaster } from "@/components/ui/sonner";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -59,6 +60,7 @@ export default function RootLayout({
               {children}
               <Toaster />
               <SwRegister />
+              <SpeedInsights />
             </ConfirmProvider>
           </AccentProvider>
         </ThemeProvider>

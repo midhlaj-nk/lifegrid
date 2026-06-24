@@ -34,6 +34,7 @@
     "@radix-ui/react-tooltip": "^1.2.9",
     "@univerjs/presets": "^0.25.0",
     "@vercel/blob": "^2.4.0",
+    "@vercel/speed-insights": "^2.0.0",
     "ai": "^6.0.201",
     "better-auth": "^1.6.16",
     "class-variance-authority": "^0.7.1",
